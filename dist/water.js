@@ -260,6 +260,15 @@ import * as THREE from 'three';
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
                 //map
+                gltfloader.load( '../3dmodel/Poolbox.glb', function( gltf ){
+                    gltf.scene.position.set(0, 0, 0);
+                    worldOctree.fromGraphNode( gltf.scene);}, 
+                    undefined, function ( error ) {
+                        console.error( error );
+                });
+
+                
+
                 gltfloader.load( '../3dmodel/Pool.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
                     // const mapbox = new THREE.Box3();
@@ -270,7 +279,6 @@ import * as THREE from 'three';
                     // new THREE.Vector3(maxX, maxY, maxZ)
                     // ]);
                     // console.log(worldOctree)
-                    worldOctree.fromGraphNode( gltf.scene);
 
 
                     // worldOctree.collisionObject.push( mapbox );
@@ -304,7 +312,7 @@ import * as THREE from 'three';
 
                     }, undefined, function ( error ) {
                         console.error( error );
-                });;
+                });
         }
             
             function onMouseMove( event ) {
@@ -467,7 +475,7 @@ import * as THREE from 'three';
             function controls( deltaTime ) {
 
             // gives a bit of air control
-            const speedDelta = deltaTime * 15;
+            const speedDelta = deltaTime * 20;
 
             if ( keyStates[ 'KeyW' ] ) {
                 playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
