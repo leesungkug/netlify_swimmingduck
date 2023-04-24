@@ -35,7 +35,17 @@ import * as THREE from 'three';
 
             loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
             // 로딩 진행 상황을 추적하여 화면에 표시하는 로직을 구현합니다.
-            };
+            console.log('Loaded ' + itemsLoaded + '/' + itemsTotal + ' files.');
+            // 로딩 상태를 나타내는 로딩 바 업데이트
+            const progressBar = document.getElementById('loading-bar');            
+            const progressText = document.getElementById('load-percent');
+
+            const percent = (itemsLoaded / itemsTotal) * 100;
+
+            progressBar.style.width = percent + '%';
+            progressText.innerHTML = percent.toFixed(0) + "%";
+
+        };
 
             loadingManager.onError = function (url) {
             // 로딩 도중 에러가 발생할 때 호출되는 콜백 함수
