@@ -45,10 +45,6 @@
 
             };
 
-            loadingManager.onError = function (url) {
-            // 로딩 도중 에러가 발생할 때 호출되는 콜백 함수
-            };
-
             const stats = new Stats();
             stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
@@ -69,19 +65,25 @@
             const mouse = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
 
-            document.addEventListener( 'keydown', ( event ) => {
-                // console.log(event.code);
-                keyStates[ event.code ] = true;
-            }
-            );
+            document.addEventListener('keydown', function(event) {
+                console.log(event.code);
+                let code = event.code;
+                keyStates[code] = true;
+              });
+              
+              document.addEventListener('keyup', function(event) {
+                let code = event.code;
+                keyStates[code] = false;
+                if (code === 'Space' || code === 32) {
+                  buttoncheck = 0;
+                }
+              });       
+            // key('a', function(){ keyStates[ "KeyA"] = true; });
+            // key('w', function(){ keyStates[ "KeyW"] = true; });
+            // key('s', function(){ keyStates[ "KeyS"] = true; });
+            // key('d', function(){ keyStates[ "KeyD"] = true; });
+            // key('space', function(){ keyStates[ "Space"] = true; });
 
-            document.addEventListener( 'keyup', ( event ) => {
-
-                keyStates[ event.code ] = false;
-                if(event.code == 'Space')
-                    buttoncheck = 0;
-
-            } );
 
 
 			const params = {
@@ -246,7 +248,7 @@
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 5;
+                controls.minDistance = 5;
 				controls.maxDistance = 50;
 
 				//
@@ -266,40 +268,9 @@
 
                 gltfloader.load( './3dmodel/Pool.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
-                    // const mapbox = new THREE.Box3();
-                    // const minX = -25, minY = -5, minZ = -15;
-                    // const maxX = 25, maxY = 5, maxZ = 15;
-                    // mapbox.setFromPoints([
-                    // new THREE.Vector3(minX, minY, minZ),
-                    // new THREE.Vector3(maxX, maxY, maxZ)
-                    // ]);
-                    // console.log(worldOctree)
-
-
-                    // worldOctree.collisionObject.push( mapbox );
-                    // console.log(gltf);
-                    // scene.traverse((child) => {
-                    //     // textureLoader.load('brick_texture.png', (texture) => {
-
-                    // if (child.isMesh) {
-                    //     // child.material.map = texture;
-                    //     // mesh.material.map = gltf.scene.children[1].material.map;
-
-                    //     // const box = new THREE.Box3().setFromObject(model);
-                    //     // const size = new THREE.Vector3();
-                    //     // box.getSize(size);
-                    //     // const maxDimension = Math.max(size.x, size.y, size.z);
-                    //     // const scale = 1 / maxDimension;
-                    //     // model.scale.set(scale, scale, scale);
-                    //     // child.material.side = THREE.DoubleSide;
-                    //     // materialArray.push(child.material);
-                    // }
-                    // });
-                    // gltf.scene.traverse((child) => {
-                    // child.name = 'map'; // 이름 설정
-                    // // child.userData.link = 'lubixcube.html';
-                    // });
-                // });                    
+                    gltf.scene.traverse((child) => {
+                    child.name = 'map'; // 이름 설정
+                    });                
                     map = gltf.scene;
                     // // console.log( navera );
                     scene.add( map );
@@ -439,8 +410,9 @@
                         // console.log(playerCollider);
                     }
                     rubberduck.position.copy( playerCollider.start );
-                    camera.position.x += deltaPosition.x;
-                    camera.position.z += deltaPosition.z;
+                    camera.lookAt(rubberduck.position);
+                    // camera.position.x += deltaPosition.x;
+                    // camera.position.z += deltaPosition.z;
                 }
             }
 
