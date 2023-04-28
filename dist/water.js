@@ -1,6 +1,4 @@
-import * as THREE from 'three';
-            import { Vector3 } from 'three';
-            import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+            import * as THREE from 'three';
             import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
             import { Water } from 'three/addons/objects/Water2.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
@@ -45,7 +43,7 @@ import * as THREE from 'three';
             progressBar.style.width = percent + '%';
             progressText.innerHTML = percent.toFixed(0) + "%";
 
-        };
+            };
 
             loadingManager.onError = function (url) {
             // 로딩 도중 에러가 발생할 때 호출되는 콜백 함수
@@ -70,9 +68,6 @@ import * as THREE from 'three';
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
-
-
-
 
             document.addEventListener( 'keydown', ( event ) => {
                 // console.log(event.code);
@@ -130,8 +125,8 @@ import * as THREE from 'three';
                 // water
 
 				const waterGeometry = new THREE.PlaneGeometry( 50, 30 );
-                const waternomalmap0 = new THREE.TextureLoader().load('../examples/textures/water/Water_1_M_Normal.jpg');
-                const waternomalmap1 = new THREE.TextureLoader().load('../examples/textures/water/Water_2_M_Normal.jpg');
+                const waternomalmap0 = new THREE.TextureLoader().load('./examples/textures/water/Water_1_M_Normal.jpg');
+                const waternomalmap1 = new THREE.TextureLoader().load('./examples/textures/water/Water_2_M_Normal.jpg');
                 water = new Water( waterGeometry, {
                     color: params.color,
                     scale: params.scale,
@@ -150,7 +145,7 @@ import * as THREE from 'three';
                 //rubberduck
 
 
-                gltfloader.load( '../3dmodel/rubberduckmodel.glb', function( gltf ){
+                gltfloader.load( './3dmodel/rubberduckmodel.glb', function( gltf ){
                     gltf.scene.position.set(0, 0.57, 0);
                     rubberduck = gltf.scene;
                     boundingBox = new THREE.Box3().setFromObject(rubberduck);
@@ -167,7 +162,7 @@ import * as THREE from 'three';
 
                 
                 //naver
-                gltfloader.load( '../3dmodel/naver.glb', function( gltf ){
+                gltfloader.load( './3dmodel/naver.glb', function( gltf ){
                     gltf.scene.position.set(2, 1.5, 1);
                     worldOctree.fromGraphNode( gltf.scene );
                     gltf.scene.traverse((child) => {
@@ -260,7 +255,7 @@ import * as THREE from 'three';
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
                 //map
-                gltfloader.load( '../3dmodel/Poolbox.glb', function( gltf ){
+                gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
                     worldOctree.fromGraphNode( gltf.scene);}, 
                     undefined, function ( error ) {
@@ -269,7 +264,7 @@ import * as THREE from 'three';
 
                 
 
-                gltfloader.load( '../3dmodel/Pool.glb', function( gltf ){
+                gltfloader.load( './3dmodel/Pool.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
                     // const mapbox = new THREE.Box3();
                     // const minX = -25, minY = -5, minZ = -15;
