@@ -14,7 +14,7 @@
             let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map;
             let backupinersect;
             let boundingBox;
-            let boxHelper;
+            // let boxHelper;
             let buttoncheck;
             const intersectBox= [];
             // const searchdirection = new THREE.Vector3(0,0,-1);
@@ -164,9 +164,9 @@
                     boundingBox = new THREE.Box3().setFromObject(rubberduck);
                     const size = boundingBox.getSize(new THREE.Vector3());
                     boundingBox.setFromCenterAndSize(boundingBox.getCenter(new THREE.Vector3()), size.multiplyScalar(1.5));
-                    boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
+                    // boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
                     // console.log(rubberduck);
-                    scene.add(boxHelper);
+                    // scene.add(boxHelper);
                     scene.add(rubberduck );
 
                     }, undefined, function ( error ) {
@@ -463,8 +463,8 @@
                 boundingBox.setFromObject(rubberduck);
                 const size = boundingBox.getSize(new THREE.Vector3());
                 boundingBox.setFromCenterAndSize(boundingBox.getCenter(new THREE.Vector3()), size.multiplyScalar(2.5));
-                boxHelper.box = boundingBox;
-                boxHelper.position.copy(rubberduck.position);
+                // boxHelper.box = boundingBox;
+                // boxHelper.position.copy(rubberduck.position);
                 // console.log(boundingBox);
 
                 for (let i = 0; i < intersectBox.length; i++) {
