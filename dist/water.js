@@ -267,6 +267,8 @@
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
+                window.addEventListener( 'touchend', onClick, false );
+
                 //map
                 gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
