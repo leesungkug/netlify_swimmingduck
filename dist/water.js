@@ -14,10 +14,10 @@
             let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map;
             let backupinersect;
             let boundingBox;
-            // let boxHelper;
+            let boxHelper;
             let buttoncheck;
             const intersectBox= [];
-            const searchdirection = new THREE.Vector3(0,0,-1);
+            // const searchdirection = new THREE.Vector3(0,0,-1);
 
             const loadingManager = new THREE.LoadingManager();
 
@@ -46,6 +46,7 @@
             };
 
             const stats = new Stats();
+            stats.maxFps = 120;
             stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
             container.appendChild( stats.domElement );
@@ -140,6 +141,7 @@
                     flowSpeed: 0.005
                 } );
                 water.position.y = 1;
+                water.position.z = 1;
                 water.rotation.x = Math.PI * - 0.5;
                 scene.add( water );
                 
@@ -149,13 +151,22 @@
 
                 gltfloader.load( './3dmodel/rubberduckmodel.glb', function( gltf ){
                     gltf.scene.position.set(0, 0.57, 0);
+                    gltf.scene.traverse((child) => {
+                        if (child.isMesh) {
+                            child.userData = {
+                                click_move: 0
+                            };
+                        child.name = 'rubberduck'; // 이름 설정
+    
+                        // child.userData.link = 'lubixcube.html';
+                        }});
                     rubberduck = gltf.scene;
                     boundingBox = new THREE.Box3().setFromObject(rubberduck);
                     const size = boundingBox.getSize(new THREE.Vector3());
                     boundingBox.setFromCenterAndSize(boundingBox.getCenter(new THREE.Vector3()), size.multiplyScalar(1.5));
-                    // boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
+                    boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
                     // console.log(rubberduck);
-                    // scene.add(boxHelper);
+                    scene.add(boxHelper);
                     scene.add(rubberduck );
 
                     }, undefined, function ( error ) {
@@ -302,17 +313,17 @@
                 //             .easing(TWEEN.Easing.Quadratic.InOut)
                 //             .start();
                 //     }
-                //     else{
-                //         if(backupinersect)
-                //         {
-                //             const tween = new TWEEN.Tween(backupinersect.object.scale)
-                //             .to({ x: 1, y: 1, z: 1 }, 500)
-                //             .easing(TWEEN.Easing.Quadratic.InOut)
-                //             .start()
-                //             backupinersect.object.material.emissive.setHex( 0x000000 );
-                //             backupinersect = undefined;
-                //         }
-                //     }
+                    // else{
+                    //     if(backupinersect)
+                    //     {
+                    //         const tween = new TWEEN.Tween(backupinersect.object.scale)
+                    //         .to({ x: 1, y: 1, z: 1 }, 500)
+                    //         .easing(TWEEN.Easing.Quadratic.InOut)
+                    //         .start()
+                    //         backupinersect.object.material.emissive.setHex( 0x000000 );
+                    //         backupinersect = undefined;
+                    //     }
+                    // }
                 // }
                 
             }
@@ -325,7 +336,11 @@
                 if ( intersects.length > 0 ) {
                     // 3. href 값 가져오기
                     const targetObject = intersects.find(intersect => intersect.object.name === 'naver');
-                    // console.log(targetObject);
+                    const waterObject = intersects.find(intersect => intersect.object.type === 'Water');
+
+                    // console.log(intersects[0].point);
+                    // console.log(intersects);
+
 
                     if (targetObject) {
                         // console.log(targetObject.object.userData);
@@ -334,8 +349,33 @@
                     console.log(link);
                     // 4. 새로운 페이지로 이동
                     window.open( link );
+                    }
+                    else if (waterObject)
+                    {
+                        let x = waterObject.point.x;
+                        let z = waterObject.point.z;
+                        rubberduck.userData.dest_x =  x;
+                        rubberduck.userData.dest_z = z;
+                        const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
+                        const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
+                        rubberduck.userData.click_Distance = Math.sqrt((deltax * deltax) + (deltaz * deltaz));
+                        rubberduck.userData.click_move = 1;
+                        // rubberduck.userData.dest_pos = new THREE.Vector3(x, 1, z);
+                        rubberduck.userData.dest_dir = new THREE.Vector3(deltax, 0, deltaz);
+                        // console.log("x : ", x);
+                        // console.log("z : ", z);
+                        // console.log("rubberdeuc : ", rubberduck.position);
+                        // console.log("direction : ", playerDirection);
+                        // console.log("destdirection : ", rubberduck.userData.dest_dir);
+
+
+
+
+
+                    }
+                
                 }
-                }
+                
             }
 
             function onWindowResize() {
@@ -359,14 +399,14 @@
 
             }
 
-			function getSideVector( angle ) {
-            playerDirection.copy(headDirection);
-            // console.log(headDirection);
-            playerDirection.applyAxisAngle(axis, angle);
-            playerDirection.normalize();
-            // console.log(playerDirection);
-            return playerDirection;
-            }
+			// function getSideVector( angle ) {
+            // playerDirection.copy(headDirection);
+            // // console.log(headDirection);
+            // playerDirection.applyAxisAngle(axis, angle);
+            // playerDirection.normalize();
+            // // console.log(playerDirection);
+            // return playerDirection;
+            // }
             function getForwardVector() {
 
             // camera.getWorldDirection( playerDirection );
@@ -396,8 +436,9 @@
                     if(playerRotateVelocity)
                     {
                         playerRotateVelocity += (playerRotateVelocity * damping);
-                        // console.log(playerRotateVelocity);
+                        // console.log("RV: ",playerRotateVelocity);
                         const deltaRotate = playerRotateVelocity * deltaTime ;
+                        // console.log(deltaRotate);
                         headDirection.applyAxisAngle( axis,deltaRotate );
                         rubberduck.rotation.y += deltaRotate;
                     }
@@ -410,6 +451,7 @@
                         // console.log(playerCollider);
                     }
                     rubberduck.position.copy( playerCollider.start );
+                    rubberduck.userData.click_Distance -= Math.sqrt((deltaPosition.x * deltaPosition.x) + (deltaPosition.z * deltaPosition.z));
                     camera.lookAt(rubberduck.position);
                     // camera.position.x += deltaPosition.x;
                     // camera.position.z += deltaPosition.z;
@@ -421,8 +463,8 @@
                 boundingBox.setFromObject(rubberduck);
                 const size = boundingBox.getSize(new THREE.Vector3());
                 boundingBox.setFromCenterAndSize(boundingBox.getCenter(new THREE.Vector3()), size.multiplyScalar(2.5));
-                // boxHelper.box = boundingBox;
-                // boxHelper.position.copy(rubberduck.position);
+                boxHelper.box = boundingBox;
+                boxHelper.position.copy(rubberduck.position);
                 // console.log(boundingBox);
 
                 for (let i = 0; i < intersectBox.length; i++) {
@@ -441,39 +483,91 @@
 
             function controls( deltaTime ) {
 
-            // gives a bit of air control
-            const speedDelta = deltaTime * 20;
+                // gives a bit of air control
+                const speedDelta = deltaTime * 20;
 
-            if ( keyStates[ 'KeyW' ] ) {
-                playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
+                if ( keyStates[ 'KeyW' ] ) {
+                    playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
 
-            }
-            if ( keyStates[ 'KeyS' ] ) {
+                }
+                if ( keyStates[ 'KeyS' ] ) {
 
-                playerVelocity.add( getForwardVector().multiplyScalar( - speedDelta ) );
+                    playerVelocity.add( getForwardVector().multiplyScalar( - speedDelta ) );
 
-            }
-            if ( keyStates[ 'KeyA' ] ) {
-                playerRotateVelocity = Math.PI * 10 *speedDelta;
-            }
+                }
+                if ( keyStates[ 'KeyA' ] ) {
+                    playerRotateVelocity = Math.PI * 10 *speedDelta;
+                }
 
-            if ( keyStates[ 'KeyD' ] ) {
+                if ( keyStates[ 'KeyD' ] ) {
 
-                playerRotateVelocity = -Math.PI * 10 *speedDelta;
-            }
-            if ( keyStates[ 'Space' ] && buttoncheck == 0) {
-                    for(let i = 0; i < intersectBox.length; i++){
-                        if (intersectBox[i].flag > 0){
-                            let link = intersectBox[i].children[0].userData.link;
-                            console.log(link);
-                            // 4. 새로운 페이지로 이동
-                            window.open( link );
-                            buttoncheck = 1;
+                    playerRotateVelocity = -Math.PI * 10 *speedDelta;
+                }
+                if ( keyStates[ 'Space' ] && buttoncheck == 0) {
+                        for(let i = 0; i < intersectBox.length; i++){
+                            if (intersectBox[i].flag > 0){
+                                let link = intersectBox[i].children[0].userData.link;
+                                console.log(link);
+                                // 4. 새로운 페이지로 이동
+                                window.open( link );
+                                buttoncheck = 1;
+                            }
                         }
-                    }
 
+                }
             }
 
+            function click_move( deltatime )
+            {
+                if (rubberduck.userData.click_move >= 1)
+                {
+
+                    
+                    // const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
+                    // const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
+                    // console.log("deltax : ",deltax);
+                    // console.log("deltaz : ", deltaz);
+
+                    const speedDelta = deltatime * 10;
+                    const angle = headDirection.angleTo(rubberduck.userData.dest_dir); 
+ 
+
+                   
+                    if (angle >= 0.01 && rubberduck.userData.click_move == 1)
+                    {
+                        playerVelocity.multiplyScalar(0);
+                        // console.log("angle : ", angle);
+                        // console.log("head : ", headDirection);
+                        const cross = new THREE.Vector3().crossVectors(headDirection, rubberduck.userData.dest_dir);
+                        const isClockwise = (cross.y > 0);
+                        if (isClockwise)
+                            playerRotateVelocity = Math.PI * 10 * speedDelta;
+                        else
+                            playerRotateVelocity = -Math.PI * 10 * speedDelta;
+                        // console.log(angle);
+                    }
+                    else if (rubberduck.userData.click_Distance > 0)
+                    {
+                        // console.log("Dist : ", rubberduck.userData.click_Distance);
+
+                        playerRotateVelocity = 0;
+                        // new TWEEN.Tween( playerCollider.start )
+                        //     .to( { x: deltax, z: deltaz }, 1 )
+                        //     .easing( TWEEN.Easing.Quadratic.Out )
+                        //     .start();
+                        rubberduck.userData.click_move = 2;
+                        playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ));
+                    }
+                    else{
+                        // const time = new THREE.Vector3(deltax, 0, deltaz) / speedDelta;
+
+                        // new TWEEN.Tween( playerCollider.start )
+                        //         .to( { x: deltax, z: deltaz }, time )
+                        //         .easing( TWEEN.Easing.Quadratic.Out )
+                        //         .start();
+                        rubberduck.userData.click_move = 0;
+                    }
+                }
             }
 
             function active() {
@@ -517,7 +611,10 @@
 
     		    for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
                     // console.log("time :",deltaTime);
-                    controls( deltaTime );
+                    if (rubberduck.userData.click_move >= 1)
+                        click_move( deltaTime );
+                    else
+                        controls( deltaTime );
 
                     updatePlayer( deltaTime );
                     
