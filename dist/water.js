@@ -266,7 +266,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener( 'touchmove', onMouseMove, false );
+                window.addEventListener('touchstart', onTouchStart, false);
                 window.addEventListener( 'click', onClick, false );
                 window.addEventListener( 'touchend', onClick, false );
 
@@ -294,6 +294,14 @@
                         console.error( error );
                 });
         }
+
+            function onTouchStart(event) {
+                // 첫 번째 터치 이벤트를 가져옴
+                const touch = event.touches[0];
+                // 마우스와 동일한 방식으로 좌표를 계산
+                mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = - (touch.clientY / window.innerHeight) * 2 + 1;
+                }
             
             function onMouseMove( event ) {
                 // 마우스 위치 감지
