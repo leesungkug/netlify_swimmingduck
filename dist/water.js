@@ -266,6 +266,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
+                window.addEventListener( 'touchmove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
                 window.addEventListener( 'touchend', onClick, false );
 
@@ -530,7 +531,7 @@
                     // console.log("deltax : ",deltax);
                     // console.log("deltaz : ", deltaz);
 
-                    const speedDelta = deltatime * 10;
+                    const speedDelta = deltatime * 20;
                     const angle = headDirection.angleTo(rubberduck.userData.dest_dir); 
  
 
