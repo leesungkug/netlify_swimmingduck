@@ -539,7 +539,7 @@
                     // console.log("deltax : ",deltax);
                     // console.log("deltaz : ", deltaz);
 
-                    const speedDelta = deltatime * 20;
+                    const speedDelta = deltatime * 12;
                     const angle = headDirection.angleTo(rubberduck.userData.dest_dir); 
  
 
