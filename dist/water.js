@@ -6,10 +6,18 @@
             import { Capsule } from 'three/addons/math/Capsule.js';
             import Stats from 'three/addons/libs/stats.module.js';
             import { TWEEN } from 'three/addons/libs/tween.module.min.js';
+            import { Audio, AudioLoader } from 'three';
 
 
 
             const container = document.getElementById( 'container' );
+
+            //ambient_audio
+            // const audio = new Audio('./audio/forest_ambience.mp3');
+            // audio.volume = 0.05;
+            // audio.loop = true;
+            // audio.play();
+
 
             let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map;
             let backupinersect;
@@ -53,6 +61,14 @@
         
             const textureLoader = new THREE.TextureLoader();
             const gltfloader = new GLTFLoader(loadingManager);
+
+            const audioLoader = new THREE.AudioLoader();
+            const listener = new THREE.AudioListener();
+            const music = new Audio(listener);
+            const effect = new Audio(listener);
+
+
+
 			const worldOctree = new Octree();
             const STEPS_PER_FRAME = 5;
             const keyStates = {};
@@ -60,7 +76,6 @@
 			const playerDirection = new THREE.Vector3();
             const playerVelocity = new THREE.Vector3();
             const headDirection = new THREE.Vector3(-1, 0, 0);
-            const playerQuaternion = new THREE.Quaternion(); // 초기 쿼터니언
             const axis = new THREE.Vector3(0, 1, 0);
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
@@ -112,6 +127,21 @@
 				camera.lookAt( scene.position );
                 playerDirection.set(-1,0,0);
                 
+                //ambiencesound
+                camera.add(listener);
+
+                const musicLoader = new AudioLoader();
+                musicLoader.load('./audio/forest_ambience.mp3', function(buffer) {
+                    music.setBuffer(buffer);
+                    music.setLoop(true);
+                    music.setVolume(0.05);
+                });
+
+                const effectLoader = new AudioLoader();
+                musicLoader.load('./audio/rubberduckeffect.wav', function(buffer) {
+                    effect.setBuffer(buffer);
+                    effect.setVolume(0.05);
+                });
 
 
 				// clock
@@ -262,15 +292,31 @@
                 controls.minDistance = 5;
 				controls.maxDistance = 50;
 
-				//
-
+				//event
+                const musicBtn = document.getElementById('music-btn');
+                musicBtn.addEventListener('click', function() {
+                    if (music.isPlaying) {
+                        music.pause();
+                    } else {
+                        music.play();
+                    }
+                });
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener('touchstart', onTouchStart, false);
                 window.addEventListener( 'click', onClick, false );
                 window.addEventListener( 'touchend', onClick, false );
+               
+                //tv                
+                gltfloader.load( './3dmodel/box.glb', function( gltf ){
+                gltf.scene.position.set(-23, 4, -16);
+                scene.add(gltf.scene);}, 
+                undefined, function ( error ) {
+                    console.error( error );
+                });
 
-                //map
+
+                //mapbox
                 gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
                     worldOctree.fromGraphNode( gltf.scene);}, 
@@ -279,7 +325,7 @@
                 });
 
                 
-
+                //map
                 gltfloader.load( './3dmodel/Pool.glb', function( gltf ){
                     gltf.scene.position.set(0, 0, 0);
                     gltf.scene.traverse((child) => {
@@ -288,6 +334,8 @@
                     map = gltf.scene;
                     // // console.log( navera );
                     scene.add( map );
+                    music.play();
+
                     animate();
 
                     }, undefined, function ( error ) {
@@ -400,11 +448,14 @@
                 const result = worldOctree.capsuleIntersect( playerCollider );
                 //boom
                 if ( result ) {
-                    const deltaPosition = result.normal.multiplyScalar( result.depth );
-                    playerCollider.translate( deltaPosition );
+                    playerVelocity.reflect( result.normal ).multiplyScalar( 1.8 );
+                    // const deltaPosition = result.normal.multiplyScalar( result.depth );
+                    // playerCollider.translate( deltaPosition );
+                    effect.play();
+
                     // console.log(result.depth);
-                    camera.position.x += deltaPosition.x;
-                    camera.position.z += deltaPosition.z;
+                    // camera.position.x += deltaPosition.x;
+                    // camera.position.z += deltaPosition.z;
                     // console.log(playerCollider);
                 }
 
@@ -519,7 +570,7 @@
                             if (intersectBox[i].flag > 0){
                                 let link = intersectBox[i].children[0].userData.link;
                                 console.log(link);
-                                // 4. 새로운 페이지로 이동
+                                // 4. 새cd 로운 페이지로 이동
                                 window.open( link );
                                 buttoncheck = 1;
                             }
@@ -622,9 +673,9 @@
 
     		    for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
                     // console.log("time :",deltaTime);
-                    if (rubberduck.userData.click_move >= 1)
-                        click_move( deltaTime );
-                    else
+                    // if (rubberduck.userData.click_move >= 1)
+                        // click_move( deltaTime );
+                    // else
                         controls( deltaTime );
 
                     updatePlayer( deltaTime );
