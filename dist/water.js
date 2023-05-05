@@ -11,13 +11,12 @@
 
 
             const container = document.getElementById( 'container' );
+            //mobile_controller
+            const controller = document.getElementById('controller');
+            const arrow = document.getElementById('arrow');
 
-            //ambient_audio
-            // const audio = new Audio('./audio/forest_ambience.mp3');
-            // audio.volume = 0.05;
-            // audio.loop = true;
-            // audio.play();
-
+            let isTouching = false;
+            let touchStart = { x: 0, y: 0 };
 
             let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map;
             let backupinersect;
@@ -87,7 +86,7 @@
                 keyStates[code] = true;
               });
               
-              document.addEventListener('keyup', function(event) {
+            document.addEventListener('keyup', function(event) {
                 let code = event.code;
                 keyStates[code] = false;
                 if (code === 'Space' || code === 32) {
@@ -99,9 +98,89 @@
             // key('s', function(){ keyStates[ "KeyS"] = true; });
             // key('d', function(){ keyStates[ "KeyD"] = true; });
             // key('space', function(){ keyStates[ "Space"] = true; });
+            //컨트롤러 설정
+            function getPointInCircle(center, radius, angle) {
+                const x = center.x + radius * Math.cos(angle);
+                const y = center.y + radius * Math.sin(angle);
+                return { x, y };
+            };
 
+            function getCameraDirectionVector(camera) {
+                // 카메라의 월드 좌표 얻기
+                const cameraPosition = new THREE.Vector3();
+                camera.getWorldPosition(cameraPosition);
+              
+                // 카메라가 바라보는 지점의 월드 좌표 얻기
+                const cameraTarget = new THREE.Vector3();
+                cameraTarget.setFromMatrixPosition(camera.matrixWorldInverse);
+              
+                // 방향 벡터 구하기
+                const directionVector = new THREE.Vector3();
+                directionVector.subVectors(cameraTarget, cameraPosition);
+                directionVector.y = 0;
+                // 정규화하여 단위 벡터로 만들기
+                directionVector.normalize();
+              
+                return directionVector;
+              };
 
+            controller.addEventListener('touchstart', (event) => {
+                isTouching = true;
+                touchStart.x = event.touches[0].clientX;
+                touchStart.y = event.touches[0].clientY;
+            });
+            
+            controller.addEventListener('touchmove', (event) => {
+                if (!isTouching) return;
+                event.preventDefault();
+                const touchCurrent = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY,
+                };
+                
+                const deltaX = touchCurrent.x - touchStart.x;
+                const deltaY = touchCurrent.y - touchStart.y;
+                
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const radius = controller.clientWidth / 2;
+                const angle = Math.atan2(deltaY, deltaX);
+            
+                if (distance > radius) {
+                    const { x, y } = getPointInCircle({ x: 0, y: 0 }, radius, angle);
+                    arrow.style.transform = `translate(${x}px, ${y}px)`;
+                } else {
+                    arrow.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                }
+                playerDirection.x = deltaX;
+                playerDirection.z = deltaY;
 
+                rubberduck.userData.dest_x =  deltaX;
+                rubberduck.userData.dest_z = deltaY;
+                // const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
+                // const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
+                rubberduck.userData.mobile_move = 1;
+                // rubberduck.userData.dest_pos = new THREE.Vector3(x, 1, z);
+               
+
+                const dest_normaldir = new THREE.Vector3(deltaX, 0, deltaY).normalize();
+                rubberduck.userData.dest_dir = dest_normaldir;
+                // console.log("x : ", x);
+                // console.log("z : ", z);
+                // console.log("rubberdeuc : ", rubberduck.position);
+                    // console.log("direction : ", playerDirection);
+                        // console.log("destdirection : ", rubberduck.userData.dest_dir);
+
+                // playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
+
+                // 여기서 deltaX와 deltaY를 사용해 Three.js 카메라 또는 오브젝트를 조종하세요.
+            });
+
+            controller.addEventListener('touchend', () => {
+                isTouching = false;
+                arrow.style.transform = 'translate(0px, 0px)';
+                rubberduck.userData.mobile_move = 0;
+            });
+            //gui 구조체
 			const params = {
 				color: '#ffffff',
 				scale: 2,
@@ -111,7 +190,9 @@
 			};
             init();
 
-
+            function isMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            };
 
 			function init() {
  
@@ -184,7 +265,7 @@
                     gltf.scene.traverse((child) => {
                         if (child.isMesh) {
                             child.userData = {
-                                click_move: 0
+                                mobile_move: 0
                             };
                         child.name = 'rubberduck'; // 이름 설정
     
@@ -303,9 +384,7 @@
                 });
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener('touchstart', onTouchStart, false);
                 window.addEventListener( 'click', onClick, false );
-                window.addEventListener( 'touchend', onClick, false );
                
                 //tv                
                 gltfloader.load( './3dmodel/box.glb', function( gltf ){
@@ -335,21 +414,17 @@
                     // // console.log( navera );
                     scene.add( map );
                     music.play();
-
+                    if (isMobile()) {
+                        controller.style.display = 'flex';
+                    } else {
+                        controller.style.display = 'none';
+                    }
                     animate();
 
                     }, undefined, function ( error ) {
                         console.error( error );
                 });
         }
-
-            function onTouchStart(event) {
-                // 첫 번째 터치 이벤트를 가져옴
-                const touch = event.touches[0];
-                // 마우스와 동일한 방식으로 좌표를 계산
-                mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = - (touch.clientY / window.innerHeight) * 2 + 1;
-                }
             
             function onMouseMove( event ) {
                 // 마우스 위치 감지
@@ -389,9 +464,17 @@
             
 
             function onClick( event ) {
+                // const flontaxis = new THREE.Vector3(0,0,-1);
+                // const camera_normaldir = getCameraDirectionVector(camera);
+                // const cameraangle = -camera_normaldir.angleTo(flontaxis);
+                // const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
+                // const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+                // const dir = new THREE.Vector3(0,0, -1).applyMatrix4(rotationMatrix);
+                // console.log("camera : ", camera_normaldir);
+                // console.log(dir);
+
                 raycaster.setFromCamera( mouse, camera );
                 let intersects = raycaster.intersectObjects( scene.children );
-
                 if ( intersects.length > 0 ) {
                     // 3. href 값 가져오기
                     const targetObject = intersects.find(intersect => intersect.object.name === 'naver');
@@ -409,29 +492,29 @@
                     // 4. 새로운 페이지로 이동
                     window.open( link );
                     }
-                    else if (waterObject)
-                    {
-                        let x = waterObject.point.x;
-                        let z = waterObject.point.z;
-                        rubberduck.userData.dest_x =  x;
-                        rubberduck.userData.dest_z = z;
-                        const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
-                        const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
-                        rubberduck.userData.click_Distance = Math.sqrt((deltax * deltax) + (deltaz * deltaz));
-                        rubberduck.userData.click_move = 1;
-                        // rubberduck.userData.dest_pos = new THREE.Vector3(x, 1, z);
-                        rubberduck.userData.dest_dir = new THREE.Vector3(deltax, 0, deltaz);
-                        // console.log("x : ", x);
-                        // console.log("z : ", z);
-                        // console.log("rubberdeuc : ", rubberduck.position);
-                        // console.log("direction : ", playerDirection);
-                        // console.log("destdirection : ", rubberduck.userData.dest_dir);
+                    // else if (waterObject)
+                    // {
+                    //     let x = waterObject.point.x;
+                    //     let z = waterObject.point.z;
+                    //     rubberduck.userData.dest_x =  x;
+                    //     rubberduck.userData.dest_z = z;
+                    //     const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
+                    //     const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
+                    //     rubberduck.userData.click_Distance = Math.sqrt((deltax * deltax) + (deltaz * deltaz));
+                    //     rubberduck.userData.mobile_move = 1;
+                    //     // rubberduck.userData.dest_pos = new THREE.Vector3(x, 1, z);
+                    //     rubberduck.userData.dest_dir = new THREE.Vector3(deltax, 0, deltaz);
+                    //     // console.log("x : ", x);
+                    //     // console.log("z : ", z);
+                    //     // console.log("rubberdeuc : ", rubberduck.position);
+                    //     // console.log("direction : ", playerDirection);
+                    //     // console.log("destdirection : ", rubberduck.userData.dest_dir);
 
 
 
 
 
-                    }
+                    // }
                 
                 }
                 
@@ -546,7 +629,7 @@
             function controls( deltaTime ) {
 
                 // gives a bit of air control
-                const speedDelta = deltaTime * 20;
+                const speedDelta = deltaTime * 10;
 
                 if ( keyStates[ 'KeyW' ] ) {
                     playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
@@ -579,9 +662,9 @@
                 }
             }
 
-            function click_move( deltatime )
+            function mobile_move( deltatime )
             {
-                if (rubberduck.userData.click_move >= 1)
+                if (rubberduck.userData.mobile_move >= 1)
                 {
 
                     
@@ -590,12 +673,12 @@
                     // console.log("deltax : ",deltax);
                     // console.log("deltaz : ", deltaz);
 
-                    const speedDelta = deltatime * 12;
+                    const speedDelta = deltatime * 10;
                     const angle = headDirection.angleTo(rubberduck.userData.dest_dir); 
  
 
                    
-                    if (angle >= 0.01 && rubberduck.userData.click_move == 1)
+                    if (angle >= 0.01 && rubberduck.userData.mobile_move == 1)
                     {
                         playerVelocity.multiplyScalar(0);
                         // console.log("angle : ", angle);
@@ -617,7 +700,7 @@
                         //     .to( { x: deltax, z: deltaz }, 1 )
                         //     .easing( TWEEN.Easing.Quadratic.Out )
                         //     .start();
-                        rubberduck.userData.click_move = 2;
+                        rubberduck.userData.mobile_move = 2;
                         playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ));
                     }
                     else{
@@ -627,7 +710,7 @@
                         //         .to( { x: deltax, z: deltaz }, time )
                         //         .easing( TWEEN.Easing.Quadratic.Out )
                         //         .start();
-                        rubberduck.userData.click_move = 0;
+                        rubberduck.userData.mobile_move = 0;
                     }
                 }
             }
@@ -663,6 +746,39 @@
 
             }}}
 
+            function    mobile_rotate( speedDelta )
+            {
+                const deltaRotate = Math.PI / 10 * speedDelta;
+                headDirection.applyAxisAngle( axis,deltaRotate );
+                rubberduck.rotation.y += deltaRotate;
+            }
+
+            function    mobile_controls( deltaTime )
+            {
+                const speedDelta = deltaTime * 12;
+
+                const flontaxis = new THREE.Vector3(0,0,-1);
+                const camera_normaldir = getCameraDirectionVector(camera);
+                const cameraangle = -camera_normaldir.angleTo(flontaxis);
+                const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
+                const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+                const dir = rubberduck.userData.dest_dir.applyMatrix4(rotationMatrix);
+                const angle = headDirection.angleTo(dir); 
+                if(angle > 0)
+                {
+                    const cross = new THREE.Vector3().crossVectors(headDirection, rubberduck.userData.dest_dir);
+                    const isClockwise = (cross.y > 0);
+                    if (isClockwise)
+                        mobile_rotate( speedDelta );
+                    else
+                        mobile_rotate( -speedDelta );
+                }
+                playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
+
+                
+
+            }
+
 
             function animate() {
 
@@ -673,9 +789,12 @@
 
     		    for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
                     // console.log("time :",deltaTime);
-                    // if (rubberduck.userData.click_move >= 1)
-                        // click_move( deltaTime );
-                    // else
+                    if (rubberduck.userData.mobile_move >= 1)
+                    {
+                        mobile_controls( deltaTime );
+                        // mobile_move( deltaTime );
+                    }
+                    else
                         controls( deltaTime );
 
                     updatePlayer( deltaTime );

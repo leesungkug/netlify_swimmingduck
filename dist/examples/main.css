@@ -162,3 +162,23 @@ a, button, input, select {
 	}
 }
 
+.controller {
+	position: fixed;
+	left: 20px;
+	bottom: 20px;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	background-color: rgba(200, 200, 200, 0.5);
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+.arrow {
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;
+
+	background-color: rgba(100, 100, 100, 0.6);
+}
