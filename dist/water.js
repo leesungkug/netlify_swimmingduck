@@ -108,12 +108,12 @@
             function getCameraDirectionVector(camera) {
                 // 카메라의 월드 좌표 얻기
                 const cameraPosition = camera.position.clone();
-                console.log("camera position",camera.position);
+                // console.log("camera position",camera.position);
               
                 // 카메라가 바라보는 지점의 월드 좌표 얻기
                 const cameraTarget = rubberduck.position.clone();
                 // cameraTarget.setFromMatrixPosition(camera.matrixWorldInverse);
-                console.log("camera target",cameraTarget);
+                // console.log("camera target",cameraTarget);
 
                 // 방향 벡터 구하기
                 const directionVector = new THREE.Vector3();
@@ -138,6 +138,9 @@
                 if (!isTouching) return;
                 event.preventDefault();
                 const touchCurrent = {
+                    // x : event.clientX,
+                    // y : event.clientY,
+    
                     x: event.touches[0].clientX,
                     y: event.touches[0].clientY,
                 };
@@ -155,8 +158,8 @@
                 } else {
                     arrow.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                 }
-                playerDirection.x = deltaX;
-                playerDirection.z = deltaY;
+                // playerDirection.x = deltaX;
+                // playerDirection.z = deltaY;
 
                 rubberduck.userData.dest_x =  deltaX;
                 rubberduck.userData.dest_z = deltaY;
@@ -468,19 +471,20 @@
             
 
             function onClick( event ) {
-                const flontaxis = new THREE.Vector3(0,0,-1);
-                const camera_normaldir = getCameraDirectionVector(camera);
-                let cameraangle = flontaxis.angleTo(camera_normaldir);
-                const camera_cross = new THREE.Vector3().crossVectors(flontaxis, camera_normaldir);
-                if (camera_cross.y < 0)
-                    cameraangle *= -1;
-                const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
-                const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-                const dir = new THREE.Vector3(0.5,0,0.5).applyMatrix4(rotationMatrix);
-                console.log("camera : ", camera_normaldir);
-                console.log("dir",dir);
-                console.log("head", headDirection);
-                console.log("position : ", rubberduck.position);
+                // const flontaxis = new THREE.Vector3(0,0,-1);
+                // const camera_normaldir = getCameraDirectionVector(camera);
+                // let cameraangle = flontaxis.angleTo(camera_normaldir);
+                // const camera_cross = new THREE.Vector3().crossVectors(flontaxis, camera_normaldir);
+                // if (camera_cross.y < 0)
+                //     cameraangle *= -1;
+                // const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
+                // const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+                // const dir = new THREE.Vector3(0.5,0,0.5).applyMatrix4(rotationMatrix);
+                // console.log("camera : ", camera_normaldir);
+                // console.log("dir",dir);
+                // console.log("head", headDirection);
+                // console.log("position : ", rubberduck.position);
+                // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
 
                 raycaster.setFromCamera( mouse, camera );
                 let intersects = raycaster.intersectObjects( scene.children );
@@ -757,6 +761,7 @@
 
             function    mobile_rotate( speedDelta )
             {
+                // playerRotateVelocity = Math.PI * 10 * speedDelta;
                 const deltaRotate = Math.PI / 10 * speedDelta;
                 headDirection.applyAxisAngle( axis,deltaRotate );
                 rubberduck.rotation.y += deltaRotate;
@@ -773,9 +778,12 @@
                     cameraangle *= -1;
                 const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
                 const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-                const dir = rubberduck.userData.dest_dir.applyMatrix4(rotationMatrix);
+                const dir = rubberduck.userData.dest_dir.clone().applyMatrix4(rotationMatrix);
+                // console.log("dest dir: ",rubberduck.userData.dest_dir);
+
+                // console.log("dir: ",dir);
                 const angle = headDirection.angleTo(dir); 
-                if(angle > 0.05)
+                if(angle > 0)
                 {
                     const cross = new THREE.Vector3().crossVectors(headDirection, dir);
                     const isClockwise = (cross.y > 0);
@@ -784,9 +792,13 @@
                     else
                         mobile_rotate( -speedDelta );
                 }
-           
-                playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
-                
+                // else{
+                //     rubberduck.userData.mobile_move = 2;
+                // }
+                // if (rubberduck.userData.mobile_move == 2){
+
+                    playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
+                // }
             
 
             }
