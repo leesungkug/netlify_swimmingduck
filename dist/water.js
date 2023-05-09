@@ -211,7 +211,7 @@
                 	// camera
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( -10, 4,10 );
+				camera.position.set( -4, 6, 12 );
 				camera.lookAt( scene.position );
                 playerDirection.set(-1,0,0);
                 
@@ -259,7 +259,7 @@
                     flowSpeed: 0.005
                 } );
                 water.position.y = 1;
-                water.position.z = 1;
+                water.position.z = 5;
                 water.rotation.x = Math.PI * - 0.5;
                 scene.add( water );
                 
@@ -336,8 +336,8 @@
 				const ambientLight = new THREE.AmbientLight( 0xeeeeee, 0.8 );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.4 );
-				directionalLight.position.set( -10, 10, 10 );
+				const directionalLight = new THREE.DirectionalLight( 0x888888, 1.0 );
+				directionalLight.position.set( -10, 20, 10 );
                 directionalLight.castShadow = true;
                 directionalLight.shadow.mapSize.width = 1024;
                 directionalLight.shadow.mapSize.height = 1024;
@@ -393,27 +393,28 @@
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
                
-                //tv                
-                gltfloader.load( './3dmodel/box.glb', function( gltf ){
-                gltf.scene.position.set(-23, 4, -16);
-                scene.add(gltf.scene);}, 
-                undefined, function ( error ) {
-                    console.error( error );
-                });
+                // //tv                
+                // gltfloader.load( './3dmodel/box.glb', function( gltf ){
+                // gltf.scene.position.set(-23, 4, -16);
+                // scene.add(gltf.scene);}, 
+                // undefined, function ( error ) {
+                //     console.error( error );
+                // });
 
 
                 //mapbox
-                gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
-                    gltf.scene.position.set(0, 0, 0);
-                    worldOctree.fromGraphNode( gltf.scene);}, 
-                    undefined, function ( error ) {
-                        console.error( error );
-                });
+                // gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
+                //     gltf.scene.position.set(0, 0, 0);
+                //     worldOctree.fromGraphNode( gltf.scene);}, 
+                //     undefined, function ( error ) {
+                //         console.error( error );
+                // });
 
                 
                 //map
-                gltfloader.load( './3dmodel/Pool.glb', function( gltf ){
-                    gltf.scene.position.set(0, 0, 0);
+                gltfloader.load( './3dmodel/roundpool.glb', function( gltf ){
+                    gltf.scene.position.set(0, 0.5, 0);
+                    worldOctree.fromGraphNode( gltf.scene); 
                     gltf.scene.traverse((child) => {
                     child.name = 'map'; // 이름 설정
                     });                
@@ -544,8 +545,14 @@
                 const result = worldOctree.capsuleIntersect( playerCollider );
                 //boom
                 if ( result ) {
-                    playerVelocity.reflect( result.normal ).multiplyScalar( 1.8 );
-                    // const deltaPosition = result.normal.multiplyScalar( result.depth );
+                    const normalVelocity = result.normal.clone().multiplyScalar(playerVelocity.dot(result.normal));
+                    const friction = -1.5;
+                    normalVelocity.multiplyScalar(friction);
+                    playerVelocity.sub(normalVelocity).negate();
+
+                    // playerVelocity.reflect( result.normal );//.multiplyScalar( 1.7 );
+                    // console.log(playerVelocity);
+                   // const deltaPosition = result.normal.multiplyScalar( result.depth );
                     // playerCollider.translate( deltaPosition );
                     effect.play();
 
