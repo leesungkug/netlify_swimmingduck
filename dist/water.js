@@ -36,6 +36,7 @@
             loadingManager.onLoad = function () {
             // 로딩이 완료될 때 호출되는 콜백 함수
             document.getElementById('loading').style.display = 'none';
+            camerazoom();
             };
 
             loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
@@ -93,7 +94,7 @@
                   buttoncheck = 0;
                 }
               });       
-            // key('a', function(){ keyStates[ "KeyA"] = true; });
+            // key('a', function(){ keyStates[ "KeyA"] = true; camm});
             // key('w', function(){ keyStates[ "KeyW"] = true; });
             // key('s', function(){ keyStates[ "KeyS"] = true; });
             // key('d', function(){ keyStates[ "KeyD"] = true; });
@@ -197,6 +198,14 @@
 			};
             init();
 
+            function camerazoom() {
+                const tween = new TWEEN.Tween(camera.position)
+                            .to({ x: -4, y: 6, z: 12 }, 2000)
+                            .easing(TWEEN.Easing.Quadratic.InOut)
+                            .start();
+                
+            }
+
             function isMobile() {
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             };
@@ -211,7 +220,7 @@
                 	// camera
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( -4, 6, 12 );
+				camera.position.set( -12, 18, 36 );
 				camera.lookAt( scene.position );
                 playerDirection.set(-1,0,0);
                 
