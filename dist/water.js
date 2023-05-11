@@ -7,6 +7,7 @@
             import Stats from 'three/addons/libs/stats.module.js';
             import { TWEEN } from 'three/addons/libs/tween.module.min.js';
             import { Audio, AudioLoader } from 'three';
+            import { WeatherAPI } from './weather.js';
 
 
 
@@ -254,7 +255,7 @@
 
                 // water
 
-				const waterGeometry = new THREE.PlaneGeometry( 50, 30 );
+				const waterGeometry = new THREE.PlaneGeometry( 40, 30 );
                 const waternomalmap0 = new THREE.TextureLoader().load('./examples/textures/water/Water_1_M_Normal.jpg');
                 const waternomalmap1 = new THREE.TextureLoader().load('./examples/textures/water/Water_2_M_Normal.jpg');
                 water = new Water( waterGeometry, {
@@ -269,6 +270,7 @@
                 } );
                 water.position.y = 1;
                 water.position.z = 5;
+                water.position.x = -10;
                 water.rotation.x = Math.PI * - 0.5;
                 scene.add( water );
                 
@@ -303,7 +305,7 @@
                 
                 //naver
                 gltfloader.load( './3dmodel/naver.glb', function( gltf ){
-                    gltf.scene.position.set(2, 1.5, 1);
+                    gltf.scene.position.set(-10, 1.5, 5);
                     worldOctree.fromGraphNode( gltf.scene );
                     gltf.scene.traverse((child) => {
                     if (child.isMesh) {
@@ -402,13 +404,13 @@
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
                
-                // //tv                
-                // gltfloader.load( './3dmodel/box.glb', function( gltf ){
-                // gltf.scene.position.set(-23, 4, -16);
-                // scene.add(gltf.scene);}, 
-                // undefined, function ( error ) {
-                //     console.error( error );
-                // });
+                //tv                
+                gltfloader.load( './3dmodel/tv.glb', function( gltf ){
+                gltf.scene.position.set(4, 2.1, -11);
+                scene.add(gltf.scene);}, 
+                undefined, function ( error ) {
+                    console.error( error );
+                });
 
 
                 //mapbox
@@ -495,6 +497,9 @@
                 // console.log("head", headDirection);
                 // console.log("position : ", rubberduck.position);
                 // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
+
+                const weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
+                weatherAPI.getWeatherData();
 
                 raycaster.setFromCamera( mouse, camera );
                 let intersects = raycaster.intersectObjects( scene.children );
