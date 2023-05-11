@@ -19,7 +19,7 @@
             let isTouching = false;
             let touchStart = { x: 0, y: 0 };
 
-            let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map;
+            let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map, tv;
             let backupinersect;
             let boundingBox;
             // let boxHelper;
@@ -81,6 +81,11 @@
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
+            //날씨
+            const weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
+            weatherAPI.getWeatherData();
+
+
 
             document.addEventListener('keydown', function(event) {
                 console.log(event.code);
@@ -206,6 +211,8 @@
                             .start();
                 
             }
+
+            
 
             function isMobile() {
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -406,12 +413,13 @@
                
                 //tv                
                 gltfloader.load( './3dmodel/tv.glb', function( gltf ){
-                gltf.scene.position.set(4, 2.1, -11);
-                scene.add(gltf.scene);}, 
+                gltf.scene.position.set(3, 2.1, -15);
+                tv = gltf.scene;
+                canvastext("Welcome~^^");
+                scene.add(tv);}, 
                 undefined, function ( error ) {
                     console.error( error );
                 });
-
 
                 //mapbox
                 // gltfloader.load( './3dmodel/Poolbox.glb', function( gltf ){
@@ -444,6 +452,34 @@
                         console.error( error );
                 });
         }
+
+        function canvastext(text){
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            const width = 500;
+            const height = 256;
+
+            // 캔버스 크기 설정
+            canvas.width = width;
+            canvas.height = height;
+
+            // 텍스처 이미지 그리기
+            // context.fillStyle = 'rgb(12, 100, 100)';
+            // context.fillRect(0, 0, width, height);
+
+            context.fillStyle = 'white';
+            context.font = 'bold 80px Arial'; // 텍스트의 폰트 설정
+            context.fillText(text, 10, 140); // 텍스트 그리기
+
+
+            // Three.js 텍스처 생성
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+
+            // 텍스처를 사용하는 메쉬 생성
+            const tvscreen = tv.children[0].children[0].children[0].children[0].children[0];
+            tvscreen.material = new THREE.MeshBasicMaterial({ map: texture });
+            };
             
             function onMouseMove( event ) {
                 // 마우스 위치 감지
@@ -481,6 +517,7 @@
                 
             }
             
+            let data;
 
             function onClick( event ) {
                 // const flontaxis = new THREE.Vector3(0,0,-1);
@@ -498,8 +535,8 @@
                 // console.log("position : ", rubberduck.position);
                 // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
 
-                const weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
-                weatherAPI.getWeatherData();
+
+                console.log(weatherAPI.data);
 
                 raycaster.setFromCamera( mouse, camera );
                 let intersects = raycaster.intersectObjects( scene.children );
