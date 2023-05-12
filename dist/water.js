@@ -139,6 +139,7 @@
                 const rect = controller.getBoundingClientRect();
                 touchStart.x = rect.left + rect.width / 2;
                 touchStart.y = rect.top + rect.height / 2;
+                screenweather();
             });
             
             controller.addEventListener('touchmove', (event) => {
@@ -523,28 +524,9 @@
             }
             
             function screenweather(){
-
-            }
-
-            function onClick( event ) {
-                // const flontaxis = new THREE.Vector3(0,0,-1);
-                // const camera_normaldir = getCameraDirectionVector(camera);
-                // let cameraangle = flontaxis.angleTo(camera_normaldir);
-                // const camera_cross = new THREE.Vector3().crossVectors(flontaxis, camera_normaldir);
-                // if (camera_cross.y < 0)
-                //     cameraangle *= -1;
-                // const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
-                // const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-                // const dir = new THREE.Vector3(0.5,0,0.5).applyMatrix4(rotationMatrix);
-                // console.log("camera : ", camera_normaldir);
-                // console.log("dir",dir);
-                // console.log("head", headDirection);
-                // console.log("position : ", rubberduck.position);
-                // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
-
                 const canvas = document.createElement('canvas');
-                const width = 512; // 캔버스의 가로 크기
-                const height = 256; // 캔버스의 세로 크기
+                const width = 500; // 캔버스의 가로 크기
+                const height = 250; // 캔버스의 세로 크기
                 canvas.width = width;
                 canvas.height = height;
 
@@ -563,11 +545,29 @@
                 context.drawImage(tex2.source.data, 250, 60, 300, 150);
                 textureLoader.load('./weather/sun.png', function(texture) {
                     // 텍스처 로딩이 완료된 후에 실행될 콜백 함수
-                    context.drawImage(texture.source.data, 50, 50, 150, 150);
+                    context.drawImage(texture.source.data, 70, 50, 150, 150);
                     const combinedTexture = new THREE.CanvasTexture(canvas);
                     screenupdate(combinedTexture);
-                  });                
+                  });            
+            }
 
+            function onClick( event ) {
+                // const flontaxis = new THREE.Vector3(0,0,-1);
+                // const camera_normaldir = getCameraDirectionVector(camera);
+                // let cameraangle = flontaxis.angleTo(camera_normaldir);
+                // const camera_cross = new THREE.Vector3().crossVectors(flontaxis, camera_normaldir);
+                // if (camera_cross.y < 0)
+                //     cameraangle *= -1;
+                // const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
+                // const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+                // const dir = new THREE.Vector3(0.5,0,0.5).applyMatrix4(rotationMatrix);
+                // console.log("camera : ", camera_normaldir);
+                // console.log("dir",dir);
+                // console.log("head", headDirection);
+                // console.log("position : ", rubberduck.position);
+                // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
+
+                screenweather();
 
 
 
