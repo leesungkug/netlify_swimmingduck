@@ -563,6 +563,8 @@
             };
             
             async function screenweather(){
+                if (weatherAPI.data == -1)
+                    return ;
                 const canvas = document.createElement('canvas');
                 const width = 500; // 캔버스의 가로 크기
                 const height = 250; // 캔버스의 세로 크기
