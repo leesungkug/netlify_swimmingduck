@@ -77,15 +77,16 @@ export class WeatherAPI {
         this.sky = -1;
         this.rain_state = -1;
         this.time = -1;
+        this.realtime = -1;
         this.day = -1;
     }
 
     async fetchWeatherData(latitude, longitude) {
 
         let ForecastGribURL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-        ForecastGribURL += '\?ServiceKey='; 
+        ForecastGribURL += "\?ServiceKey="; 
         ForecastGribURL += this.apiKey;
-        ForecastGribURL += "&pageNo=1&numOfRows=10";        
+        ForecastGribURL += "&pageNo=1&numOfRows=30";        
         ForecastGribURL += "&dataType=json";
         ForecastGribURL += "&base_date=" + this.day;
         ForecastGribURL += "&base_time=" + this.time;
@@ -107,9 +108,25 @@ export class WeatherAPI {
             this.day += "0";
         this.day += `${currentMonth}`;
         this.day += `${currentDay}`;
+        this.realtime = `${currentHour}` + "00";
         let t = (Math.floor(currentHour / 3) - 1 );
+        if (t == -1 && currentHour != 3)
+        {
+            t = 7;
+            this.day -= 1;
+        }
+        else if (t == -1 && currentHour >= 3)
+            t = 0;
         this.time = t * 3 + 2;
+        if (this.time < 10)
+            this.time = ("0" + this.time);
+        if (this.realtime < 10)
+            this.realtime = ("0" + this.realtime);
+
         this.time += "00";
+        console.log("time: ", this.time);
+        console.log("day", this.day);
+        console.log("realtime: ", this.realtime);
     }
 
     async getWeatherData() {
@@ -119,11 +136,14 @@ export class WeatherAPI {
             const longitude = position.coords.longitude;  
             const re = dfs_xy_conv("toXY", latitude, longitude);         
             this.data = await this.fetchWeatherData(re['x'], re['y']);
-            console.log(this.data);
-            this.tmp = this.data.response.body.items.item[0].fcstValue;
-            this.sky = this.data.response.body.items.item[5].fcstValue;
-            this.rain_state = this.data.response.body.items.item[6].fcstValue;
-            this.rain = this.data.response.body.items.item[7].fcstValue;
+            // console.log(this.data);
+            const arr = this.data.response.body.items.item;
+            const curarr = arr.filter(obj => obj.fcstTime == this.realtime)
+            // console.log(curarr);
+            this.tmp = curarr[0].fcstValue;
+            this.sky = curarr[5].fcstValue;
+            this.rain_state = curarr[6].fcstValue;
+            this.rain = curarr[7].fcstValue;
         });
     }
 }
