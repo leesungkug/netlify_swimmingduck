@@ -522,47 +522,8 @@
                 // }
                 
             }
-
-            function getweatherimg(weather){
-                if (weather.rain_state > 0)
-                {
-                    const flag = weather.rain_state;
-                    switch(flag)
-                    {
-                        case 1:
-                            return("./weather/rainy.png");
-                        case (flag >= 2 && flag <=3):
-                            return("./weather/snowy.png");
-                    }
-                }
-                if (weather.time < "1900")
-                {
-                    switch(true)
-                    {
-                        case (weather.sky <= 5):
-                            return ("./weather/sun.png");
-                        case (weather.sky > 5 && sky < 8):
-                            return ("./weather/cloudy.png");
-                        case (weather.sky >= 8 && sky <= 10):
-                            return ("./weather/cloud.png");
-                    }
-
-                }
-                else
-                {                        
-                    switch(true)
-                    {
-                        case (weather.sky <= 5):
-                            console.log("dddd");
-                            return ("./weather/night.png");
-                        case (weather.sky > 5 && sky <= 10):
-                            return ("./weather/cloudmoon.png");
-                    }
-
-                }
-            };
             
-            async function screenweather(){
+            function screenweather(){
                 const canvas = document.createElement('canvas');
                 const width = 500; // 캔버스의 가로 크기
                 const height = 250; // 캔버스의 세로 크기
@@ -578,23 +539,22 @@
                 console.log(weatherAPI.rain_state);
                 console.log(weatherAPI.tmp);
                 console.log(weatherAPI.sky);
-                const skypath = (weatherAPI.time > "1900")?"./weather/nightsky.png":"./weather/sky.jpeg";
-                textureLoader.load(skypath, function(texture) {
+                textureLoader.load('./weather/sky.jpeg', function(texture) {
                     context.drawImage(texture.source.data, 0, 0, 500, 250);
                     const tex1 = canvastext(weatherAPI.tmp + "℃", 100, 150, 100);
                     context.drawImage(tex1.source.data, 250, 20, 300, 150);
                     const tex2 = canvastext("☔︎ " + weatherAPI.rain + "%", 100, 150, 50);
                     context.drawImage(tex2.source.data, 250, 60, 300, 150);
-                    let weatherpath = getweatherimg(weatherAPI);
-                    textureLoader.load(weatherpath, function(texture) {
-                        // 텍스처 로딩이 완료된 후에 실행될 콜백 함수
-                        context.drawImage(texture.source.data, 70, 50, 150, 150);
-                        const combinedTexture = new THREE.CanvasTexture(canvas);
-                        screenupdate(combinedTexture);
-                      }); 
+      
+    
                   }); 
                 
-                           
+                textureLoader.load('./weather/sun.png', function(texture) {
+                    // 텍스처 로딩이 완료된 후에 실행될 콜백 함수
+                    context.drawImage(texture.source.data, 70, 50, 150, 150);
+                    const combinedTexture = new THREE.CanvasTexture(canvas);
+                    screenupdate(combinedTexture);
+                  });            
             }
 
             function onClick( event ) {

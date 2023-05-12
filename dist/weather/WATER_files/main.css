@@ -1,0 +1,183 @@
+body {
+	margin: 0;
+	background-color: #000;
+	color: #fff;
+	font-family: Monospace;
+	font-size: 13px;
+	line-height: 24px;
+	overscroll-behavior: none;
+}
+
+a {
+	color: #ff0;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+button {
+	cursor: pointer;
+	text-transform: uppercase;
+}
+#music-btn img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+#music-btn img:active{
+	opacity: 0.2;
+}
+
+
+#music-btn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 50px;
+	height: 30px;
+	border: none;
+	padding: 0;
+	background-color: transparent;
+}  
+
+#info {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	text-align: center;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+a, button, input, select {
+	pointer-events: auto;
+}
+
+.mesh-element:hover {
+    box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+    border: 1px solid rgba(127,255,255,0.75);
+}
+
+@keyframes rotate {
+	0% { transform: rotate(-8deg); }
+	25% { transform: rotate(8deg); }
+	50% { transform: rotate(-8deg); }
+	75% { transform: rotate(8deg); }
+	100% { transform: rotate(-8deg); }
+  }
+
+.loading-img img {
+	width: 100px;
+	height: 60px;
+	object-fit: cover;
+	animation-name: rotate; /* 사용할 애니메이션 이름 */
+  	animation-duration: 2s; /* 애니메이션 지속시간 */
+  	animation-iteration-count: infinite; /* 반복 회수 (무한 반복) */
+  	animation-timing-function: linear; /* 애니메이션 가속도 설정 */
+}
+
+#loading {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex; /* 로딩이 완료되면 화면에서 숨김 */
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	z-index: 100;
+}
+
+.loading-img {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+  }
+  
+  #loading-text {
+	margin-top: 1px;
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	font-size: 15px;
+
+  }
+  #loading-manager {
+	display: flex;
+	flex-direction: row;
+	align-items: center;	
+	height: 10px;
+  }
+
+  #loading-bar-container {
+	width: 100%;
+	height: 10px;
+	border: none;
+	border-radius: 10px;
+	background-color: #f2f2f2;
+	z-index: 1000;
+  }
+  
+  #loading-bar {
+	height: 100%;
+	border-radius: 10px;
+	background-color: #eecc00;
+	width: 0%;
+	align-items: center;
+	transition: width 0.1s ease-out;
+  }
+
+  #load-percent {
+	position: relative;
+	right: -5px;
+	font-weight: bold;
+	font-size: 10px;
+
+  }
+
+.lil-gui {
+	z-index: 2 !important; /* TODO Solve this in HTML */
+}
+
+
+
+@media all and ( max-width: 640px ) {
+	.lil-gui.root { 
+		right: auto;
+		top: auto;
+		max-height: 50%;
+		max-width: 80%;
+		bottom: 0;
+		left: 0;
+	}
+}
+
+.controller {
+	position: fixed;
+	left: 25px;
+	bottom: 25px;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	background-color: rgba(200, 200, 200, 0.5);
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+.arrow {
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;
+	background-color: rgba(100, 100, 100, 0.6);
+}

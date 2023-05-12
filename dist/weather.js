@@ -76,30 +76,50 @@ export class WeatherAPI {
         this.rain = -1;
         this.sky = -1;
         this.rain_state = -1;
-        console.log(this.apiKey);
+        this.time = -1;
+        this.day = -1;
     }
 
     async fetchWeatherData(latitude, longitude) {
-        // let apikey = "HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D";
-        let ForecastGribURL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+
+        let ForecastGribURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
         ForecastGribURL += "\?ServiceKey="; 
         ForecastGribURL += this.apiKey;
         ForecastGribURL += "&pageNo=1&numOfRows=10";        
         ForecastGribURL += "&dataType=json";
-        ForecastGribURL += "&base_date=20230512";
-        ForecastGribURL += "&base_time=1400";
+        ForecastGribURL += "&base_date=" + this.day;
+        ForecastGribURL += "&base_time=" + this.time;
         ForecastGribURL += "&nx=" + latitude + "&ny=" + longitude;
         const response = await fetch(ForecastGribURL);
         const data = await response.json();
         return (data);
     }
 
+    getdaytime() {
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+        
+        const currentYear = currentTime.getFullYear();
+        const currentMonth = currentTime.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
+        const currentDay = currentTime.getDate();
+        this.day = currentYear;
+        if(currentMonth < 10)
+            this.day += "0";
+        this.day += `${currentMonth}`;
+        this.day += `${currentDay}`;
+        let t = (Math.floor(currentHour / 3) - 1 );
+        this.time = t * 3 + 2;
+        this.time += "00";
+    }
+
     async getWeatherData() {
         navigator.geolocation.getCurrentPosition(async (position) => {
+            this.getdaytime();
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;  
             const re = dfs_xy_conv("toXY", latitude, longitude);         
             this.data = await this.fetchWeatherData(re['x'], re['y']);
+            console.log(this.data);
             this.tmp = this.data.response.body.items.item[0].fcstValue;
             this.sky = this.data.response.body.items.item[5].fcstValue;
             this.rain_state = this.data.response.body.items.item[6].fcstValue;
