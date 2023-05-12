@@ -415,7 +415,8 @@
                 gltfloader.load( './3dmodel/tv.glb', function( gltf ){
                 gltf.scene.position.set(3, 2.1, -15);
                 tv = gltf.scene;
-                canvastext("Welcome~^^");
+                let texture = canvastext("Welcome~^^", 10, 150, 80);
+                screenupdate(texture);
                 scene.add(tv);}, 
                 undefined, function ( error ) {
                     console.error( error );
@@ -452,34 +453,38 @@
                         console.error( error );
                 });
         }
+        function screenupdate(texture)
+        {
+            // 텍스처를 사용하는 메쉬 생성
+            const tvscreen = tv.children[0].children[0].children[0].children[0].children[0];
+            tvscreen.material = new THREE.MeshBasicMaterial({ map: texture });
+        }
 
-        function canvastext(text){
+        function canvastext(text, wid, hei, px){
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
             const width = 500;
-            const height = 256;
+            const height = 250;
 
             // 캔버스 크기 설정
             canvas.width = width;
             canvas.height = height;
 
             // 텍스처 이미지 그리기
-            // context.fillStyle = 'rgb(12, 100, 100)';
+            // context.fillStyle = 'red';
             // context.fillRect(0, 0, width, height);
 
             context.fillStyle = 'white';
-            context.font = 'bold 80px Arial'; // 텍스트의 폰트 설정
-            context.fillText(text, 10, 140); // 텍스트 그리기
+            context.font = `bold ${px}px Arial`; // 텍스트의 폰트 설정
+            context.fillText(text, wid, hei); // 텍스트 그리기
 
 
             // Three.js 텍스처 생성
             const texture = new THREE.Texture(canvas);
             texture.needsUpdate = true;
 
-            // 텍스처를 사용하는 메쉬 생성
-            const tvscreen = tv.children[0].children[0].children[0].children[0].children[0];
-            tvscreen.material = new THREE.MeshBasicMaterial({ map: texture });
-            };
+            return(texture);
+        };
             
             function onMouseMove( event ) {
                 // 마우스 위치 감지
@@ -517,7 +522,9 @@
                 
             }
             
-            let data;
+            function screenweather(){
+
+            }
 
             function onClick( event ) {
                 // const flontaxis = new THREE.Vector3(0,0,-1);
@@ -535,8 +542,34 @@
                 // console.log("position : ", rubberduck.position);
                 // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
 
+                const canvas = document.createElement('canvas');
+                const width = 512; // 캔버스의 가로 크기
+                const height = 256; // 캔버스의 세로 크기
+                canvas.width = width;
+                canvas.height = height;
 
-                console.log(weatherAPI.data);
+                // 캔버스 컨텍스트 가져오기
+                const context = canvas.getContext('2d');
+
+
+
+                console.log(weatherAPI.rain);
+                console.log(weatherAPI.rain_state);
+                console.log(weatherAPI.tmp);
+                console.log(weatherAPI.sky);
+                const tex1 = canvastext(weatherAPI.tmp + "℃", 100, 150, 100);
+                context.drawImage(tex1.source.data, 250, 20, 300, 150);
+                const tex2 = canvastext("☔︎ " + weatherAPI.rain + "%", 100, 150, 50);
+                context.drawImage(tex2.source.data, 250, 60, 300, 150);
+                textureLoader.load('./weather/sun.png', function(texture) {
+                    // 텍스처 로딩이 완료된 후에 실행될 콜백 함수
+                    context.drawImage(texture.source.data, 50, 50, 150, 150);
+                    const combinedTexture = new THREE.CanvasTexture(canvas);
+                    screenupdate(combinedTexture);
+                  });                
+
+
+
 
                 raycaster.setFromCamera( mouse, camera );
                 let intersects = raycaster.intersectObjects( scene.children );
