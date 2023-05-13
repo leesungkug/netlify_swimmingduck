@@ -86,7 +86,7 @@ export class WeatherAPI {
         let ForecastGribURL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
         ForecastGribURL += "\?ServiceKey="; 
         ForecastGribURL += this.apiKey;
-        ForecastGribURL += "&pageNo=1&numOfRows=30";        
+        ForecastGribURL += "&pageNo=1&numOfRows=50";        
         ForecastGribURL += "&dataType=json";
         ForecastGribURL += "&base_date=" + this.day;
         ForecastGribURL += "&base_time=" + this.time;
@@ -124,9 +124,9 @@ export class WeatherAPI {
             this.time = ("0" + this.time);
 
         this.time += "00";
-        console.log("time: ", this.time);
-        console.log("day", this.day);
-        console.log("realtime: ", this.realtime);
+        // console.log("time: ", this.time);
+        // console.log("day", this.day);
+        // console.log("realtime: ", this.realtime);
     }
 
     async getWeatherData() {

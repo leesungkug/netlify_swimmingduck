@@ -564,7 +564,7 @@
             
             async function screenweather(){
                 if (weatherAPI.data == -1)
-                    return ;
+                    return
                 const canvas = document.createElement('canvas');
                 const width = 500; // 캔버스의 가로 크기
                 const height = 250; // 캔버스의 세로 크기
@@ -587,6 +587,8 @@
                     context.drawImage(tex1.source.data, 250, 20, 300, 150);
                     const tex2 = canvastext("☔︎ " + weatherAPI.rain + "%", 100, 150, 50);
                     context.drawImage(tex2.source.data, 250, 60, 300, 150);
+                    const tex3 = canvastext("KST 기준 :"+ weatherAPI.day + " / " + weatherAPI.realtime, 0, 100, 40);
+                    context.drawImage(tex3.source.data, 310, 210, 170, 75);
                     let weatherpath = getweatherimg(weatherAPI);
                     textureLoader.load(weatherpath, function(texture) {
                         // 텍스처 로딩이 완료된 후에 실행될 콜백 함수
