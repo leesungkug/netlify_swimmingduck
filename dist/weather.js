@@ -109,6 +109,8 @@ export class WeatherAPI {
         this.day += `${currentMonth}`;
         this.day += `${currentDay}`;
         this.realtime = `${currentHour}` + "00";
+        if (currentHour < 10)
+            this.realtime = "0" + this.realtime;
         let t = (Math.floor(currentHour / 3) - 1 );
         if (t == -1 && currentHour != 3)
         {
@@ -120,8 +122,6 @@ export class WeatherAPI {
         this.time = t * 3 + 2;
         if (this.time < 10)
             this.time = ("0" + this.time);
-        if (this.realtime < 10)
-            this.realtime = ("0" + this.realtime);
 
         this.time += "00";
         console.log("time: ", this.time);
