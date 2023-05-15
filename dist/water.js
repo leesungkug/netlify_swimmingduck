@@ -82,8 +82,7 @@
             const mouse = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
             //날씨
-            const weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
-            weatherAPI.getWeatherData();
+            let weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
 
 
 
@@ -398,6 +397,8 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
                 controls.minDistance = 5;
 				controls.maxDistance = 50;
+                controls.minPolarAngle = Math.PI / 4; // 최소 각도 (45도)
+                controls.maxPolarAngle = Math.PI / 2.2  ; // 최대 각도 
 
 				//event
                 const musicBtn = document.getElementById('music-btn');
@@ -416,8 +417,18 @@
                 gltfloader.load( './3dmodel/tv.glb', function( gltf ){
                 gltf.scene.position.set(3, 2.1, -15);
                 tv = gltf.scene;
+                // console.log(tv);
+                tv.castShadow = true;
                 let texture = canvastext("Welcome~^^", 10, 150, 80);
                 screenupdate(texture);
+                gltf.scene.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData = {
+                            weather: 1
+                        };
+                    child.name = 'screen'; // 이름 설정
+                    }});
+                intersectBox.push(tv);
                 scene.add(tv);}, 
                 undefined, function ( error ) {
                     console.error( error );
@@ -440,6 +451,8 @@
                     child.name = 'map'; // 이름 설정
                     });                
                     map = gltf.scene;
+                    map.receiveShadow = true;
+                    // console.log(map);
                     // // console.log( navera );
                     scene.add( map );
                     music.play();
@@ -472,7 +485,7 @@
             canvas.height = height;
 
             // 텍스처 이미지 그리기
-            // context.fillStyle = 'red';
+            // context.fillStyle = 'rgba(0,0,0,1)';
             // context.fillRect(0, 0, width, height);
 
             context.fillStyle = 'white';
@@ -493,7 +506,7 @@
                 mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
                 raycaster.setFromCamera( mouse, camera );
-                const intersects = raycaster.intersectObjects( scene.children, true );
+
                 // 검색된 객체에 대해 하이라이트 스케일 처리
                 // if ( intersects.length > 0 ) {
                 //     // console.log(intersects);
@@ -522,6 +535,7 @@
                 // }
                 
             }
+
 
             function getweatherimg(weather){
                 if (weather.rain_state > 0)
@@ -553,7 +567,6 @@
                     switch(true)
                     {
                         case (weather.sky <= 5):
-                            console.log("dddd");
                             return ("./weather/night.png");
                         case (weather.sky > 5 && sky <= 10):
                             return ("./weather/cloudmoon.png");
@@ -564,7 +577,7 @@
             
             async function screenweather(){
                 if (weatherAPI.data == -1)
-                    return
+                    return;
                 const canvas = document.createElement('canvas');
                 const width = 500; // 캔버스의 가로 크기
                 const height = 250; // 캔버스의 세로 크기
@@ -573,20 +586,24 @@
 
                 // 캔버스 컨텍스트 가져오기
                 const context = canvas.getContext('2d');
-
-
-
-                console.log(weatherAPI.rain);
-                console.log(weatherAPI.rain_state);
-                console.log(weatherAPI.tmp);
-                console.log(weatherAPI.sky);
-                const skypath = (weatherAPI.time > "1900")?"./weather/nightsky.png":"./weather/sky.jpeg";
+                // console.log(weatherAPI.rain);
+                // console.log(weatherAPI.rain_state);
+                // console.log(weatherAPI.tmp);
+                // console.log(weatherAPI.sky);
+                let curtime = Number(weatherAPI.time);
+                if (curtime > 1900)
+                {
+                    scene.background = new THREE.Color( 0x222222 );
+                    scene.children[1].intensity = 0.4;
+                    console.log(scene);
+                }
+                const skypath = (curtime > 1900 )?"./weather/nightsky.png":"./weather/sky.jpeg";
                 textureLoader.load(skypath, function(texture) {
                     context.drawImage(texture.source.data, 0, 0, 500, 250);
-                    const tex1 = canvastext(weatherAPI.tmp + "℃", 100, 150, 100);
-                    context.drawImage(tex1.source.data, 250, 20, 300, 150);
-                    const tex2 = canvastext("☔︎ " + weatherAPI.rain + "%", 100, 150, 50);
-                    context.drawImage(tex2.source.data, 250, 60, 300, 150);
+                    const tex1 = canvastext(weatherAPI.tmp + "℃", 200, 150, 150);
+                    context.drawImage(tex1.source.data, 150, 20, 300, 150);
+                    const tex2 = canvastext("☔ " + weatherAPI.rain + "%", 100, 150, 50);
+                    context.drawImage(tex2.source.data, 220, 60, 300, 150);
                     const tex3 = canvastext("KST 기준 :"+ weatherAPI.day + " / " + weatherAPI.realtime, 0, 100, 40);
                     context.drawImage(tex3.source.data, 310, 210, 170, 75);
                     let weatherpath = getweatherimg(weatherAPI);
@@ -596,76 +613,37 @@
                         const combinedTexture = new THREE.CanvasTexture(canvas);
                         screenupdate(combinedTexture);
                       }); 
-                  }); 
-                
-                           
+                  });
+                weatherAPI.data = -1;
             }
 
             function onClick( event ) {
-                // const flontaxis = new THREE.Vector3(0,0,-1);
-                // const camera_normaldir = getCameraDirectionVector(camera);
-                // let cameraangle = flontaxis.angleTo(camera_normaldir);
-                // const camera_cross = new THREE.Vector3().crossVectors(flontaxis, camera_normaldir);
-                // if (camera_cross.y < 0)
-                //     cameraangle *= -1;
-                // const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, cameraangle);
-                // const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-                // const dir = new THREE.Vector3(0.5,0,0.5).applyMatrix4(rotationMatrix);
-                // console.log("camera : ", camera_normaldir);
-                // console.log("dir",dir);
-                // console.log("head", headDirection);
-                // console.log("position : ", rubberduck.position);
-                // console.log("mobile_dest_dir : ", rubberduck.userData.dest_dir);
-
-                screenweather();
-
-
-
                 raycaster.setFromCamera( mouse, camera );
-                let intersects = raycaster.intersectObjects( scene.children );
+
+                for (let i = 0; i < intersectBox.length; i++) {
+                    let intersects = raycaster.intersectObjects( intersectBox );
                 if ( intersects.length > 0 ) {
                     // 3. href 값 가져오기
-                    const targetObject = intersects.find(intersect => intersect.object.name === 'naver');
-                    const waterObject = intersects.find(intersect => intersect.object.type === 'Water');
-
                     // console.log(intersects[0].point);
-                    // console.log(intersects);
-
-
-                    if (targetObject) {
-                        // console.log(targetObject.object.userData);
-
-                    let link = targetObject.object.userData.link;
-                    console.log(link);
-                    // 4. 새로운 페이지로 이동
-                    window.open( link );
+                    // console.log(intersects[0]);
+                    let flag = intersects[0].object.userData;
+                    if(flag.link)
+                    {
+                        let link = intersects[0].object.userData.link;
+                        console.log(link);
+                        // 4. 새로운 페이지로 이동
+                        window.open( link );
                     }
-                    // else if (waterObject)
-                    // {
-                    //     let x = waterObject.point.x;
-                    //     let z = waterObject.point.z;
-                    //     rubberduck.userData.dest_x =  x;
-                    //     rubberduck.userData.dest_z = z;
-                    //     const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
-                    //     const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
-                    //     rubberduck.userData.click_Distance = Math.sqrt((deltax * deltax) + (deltaz * deltaz));
-                    //     rubberduck.userData.mobile_move = 1;
-                    //     // rubberduck.userData.dest_pos = new THREE.Vector3(x, 1, z);
-                    //     rubberduck.userData.dest_dir = new THREE.Vector3(deltax, 0, deltaz);
-                    //     // console.log("x : ", x);
-                    //     // console.log("z : ", z);
-                    //     // console.log("rubberdeuc : ", rubberduck.position);
-                    //     // console.log("direction : ", playerDirection);
-                    //     // console.log("destdirection : ", rubberduck.userData.dest_dir);
-
-
-
-
-
-                    // }
-                
+                    else(flag.weather == 1)
+                    {
+                        weatherAPI.getWeatherData();
+                        let texture = canvastext("Connecting...", 150, 140, 30);
+                        screenupdate(texture);
+                    }
                 }
                 
+                
+            }
             }
 
             function onWindowResize() {
@@ -767,16 +745,16 @@
                 // console.log(boundingBox);
 
                 for (let i = 0; i < intersectBox.length; i++) {
-                const objectBoundingBox = new THREE.Box3().setFromObject(intersectBox[i]);
-                if (boundingBox.intersectsBox(objectBoundingBox)) {
-                    // console.log(intersectBox[i]);
-                    if(intersectBox[i].flag !== 2)
-                        intersectBox[i].flag = 1;
-                    // 충돌했을 때 수행할 로직 작성
-                }
-                else{
-                    intersectBox[i].flag = 0;
-                }
+                    const objectBoundingBox = new THREE.Box3().setFromObject(intersectBox[i]);
+                    if (boundingBox.intersectsBox(objectBoundingBox)) {
+                        // console.log(intersectBox[i]);
+                        if(intersectBox[i].flag !== 2)
+                            intersectBox[i].flag = 1;
+                        // 충돌했을 때 수행할 로직 작성
+                    }
+                    else{
+                        intersectBox[i].flag = 0;
+                    }
                 }}
             }
 
@@ -875,30 +853,36 @@
                     const targetObject = intersectBox[i].children[0];
                     backupinersect = targetObject;
                     targetObject.material.emissive.setHex( 0x363636 );
-                    // console.log(targetObject);
+                    console.log(targetObject);
                     const tween = new TWEEN.Tween(targetObject.scale)
                             .to({ x: 1.8, y: 1.8 , z: 1.8 }, 300)
                             .easing(TWEEN.Easing.Quadratic.InOut)
                             .start();
-
                     intersectBox[i].flag = 2;
                     // console.log(targetObject);
                     // console.log(scene.children);    
                     // 충돌했을 때 수행할 로직 작성
                 }
-                else if(intersectBox[i].flag == 0){
-                    if(backupinersect)
-                        {
-                            // console.log("dsd")
+                else if(intersectBox[i].flag === 0){
+                    if(backupinersect == intersectBox[i].children[0])
+                    {
+                            console.log("dsd")
                             const tween = new TWEEN.Tween(backupinersect.scale)
                                 .to({ x: 1, y: 1, z: 1 }, 300)
                                 .easing(TWEEN.Easing.Quadratic.InOut)
                                 .start()
                             backupinersect.material.emissive.setHex( 0x000000 );
                             backupinersect = undefined;   
+                    }
+                }
+                else if (intersectBox[i].flag === 3)
+                {
+                    const targetObject = intersectBox[i].children[0];
+                    backupinersect = targetObject;
+                    targetObject.material.emissive.setHex( 0x363636 );
                 }
 
-            }}}
+        }}
 
             function    mobile_rotate( speedDelta )
             {
@@ -957,7 +941,6 @@
                     if (rubberduck.userData.mobile_move >= 1)
                     {
                         mobile_controls( deltaTime );
-                        // mobile_move( deltaTime );
                     }
                     else
                         controls( deltaTime );
@@ -965,8 +948,11 @@
                     updatePlayer( deltaTime );
                     
                     updateBoudingBox ();
+                    
+                    screenweather();
 
                     active(); 
+
                     TWEEN.update();
 
                 }

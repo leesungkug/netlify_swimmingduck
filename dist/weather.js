@@ -84,7 +84,7 @@ export class WeatherAPI {
     async fetchWeatherData(latitude, longitude) {
 
         let ForecastGribURL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-        ForecastGribURL += "\?ServiceKey="; 
+        ForecastGribURL += "?ServiceKey="; 
         ForecastGribURL += this.apiKey;
         ForecastGribURL += "&pageNo=1&numOfRows=50";        
         ForecastGribURL += "&dataType=json";
