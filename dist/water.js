@@ -601,9 +601,9 @@
                 textureLoader.load(skypath, function(texture) {
                     context.drawImage(texture.source.data, 0, 0, 500, 250);
                     const tex1 = canvastext(weatherAPI.tmp + "℃", 200, 150, 150);
-                    context.drawImage(tex1.source.data, 150, 20, 300, 150);
+                    context.drawImage(tex1.source.data, 150, 30, 300, 150);
                     const tex2 = canvastext("☔ " + weatherAPI.rain + "%", 100, 150, 50);
-                    context.drawImage(tex2.source.data, 220, 60, 300, 150);
+                    context.drawImage(tex2.source.data, 220, 70, 300, 150);
                     const tex3 = canvastext("KST 기준 :"+ weatherAPI.day + " / " + weatherAPI.realtime, 0, 100, 40);
                     context.drawImage(tex3.source.data, 310, 210, 170, 75);
                     let weatherpath = getweatherimg(weatherAPI);
