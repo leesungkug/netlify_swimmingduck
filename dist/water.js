@@ -138,7 +138,7 @@
                 const rect = controller.getBoundingClientRect();
                 touchStart.x = rect.left + rect.width / 2;
                 touchStart.y = rect.top + rect.height / 2;
-                screenweather();
+                clcikevent();
             });
             
             controller.addEventListener('touchmove', (event) => {
@@ -617,9 +617,8 @@
                 weatherAPI.data = -1;
             }
 
-            function onClick( event ) {
+            function clcikevent(){
                 raycaster.setFromCamera( mouse, camera );
-
                 for (let i = 0; i < intersectBox.length; i++) {
                     let intersects = raycaster.intersectObjects( intersectBox );
                 if ( intersects.length > 0 ) {
@@ -641,9 +640,10 @@
                         screenupdate(texture);
                     }
                 }
-                
-                
-            }
+            }}
+
+            function onClick( event ) {    
+                clcikevent();
             }
 
             function onWindowResize() {
