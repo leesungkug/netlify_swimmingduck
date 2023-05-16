@@ -139,13 +139,7 @@
                 const rect = controller.getBoundingClientRect();
                 touchStart.x = rect.left + rect.width / 2;
                 touchStart.y = rect.top + rect.height / 2;
-                const touchEvent = event.changedTouches[0];
-                const touchX = (touchEvent.clientX / window.innerWidth) * 2 - 1;
-                const touchY = -(touchEvent.clientY / window.innerHeight) * 2 + 1;
-              
-                // 터치 좌표 설정
-                touch.set(touchX, touchY);
-                clickevent(touch);
+
             }
             );
 
@@ -420,6 +414,7 @@
 				window.addEventListener( 'resize', onWindowResize );
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'click', onClick, false );
+                window.addEventListener( 'touchstart', ontouchstart, false);
                
                 //tv                
                 gltfloader.load( './3dmodel/tv.glb', function( gltf ){
@@ -628,8 +623,7 @@
             function clickevent(control){
                 
                 raycaster.setFromCamera( control, camera );
-                
-
+            
                 for (let i = 0; i < intersectBox.length; i++) {
                     let intersects = raycaster.intersectObjects( intersectBox );
                 if ( intersects.length > 0 ) {
@@ -655,6 +649,18 @@
 
             function onClick( event ) {    
                 clickevent(mouse);
+            }
+
+            function ontouchstart ( event ) {
+                event.preventDefault();
+
+                const touchEvent = event.changedTouches[0];
+                const touchX = (touchEvent.clientX / window.innerWidth) * 2 - 1;
+                const touchY = -(touchEvent.clientY / window.innerHeight) * 2 + 1;
+              
+                // 터치 좌표 설정
+                touch.set(touchX, touchY);
+                clickevent(touch);
             }
 
             function onWindowResize() {
