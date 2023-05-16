@@ -80,6 +80,7 @@
             const axis = new THREE.Vector3(0, 1, 0);
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
+            const touch = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
             //날씨
             let weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
@@ -138,9 +139,16 @@
                 const rect = controller.getBoundingClientRect();
                 touchStart.x = rect.left + rect.width / 2;
                 touchStart.y = rect.top + rect.height / 2;
-                clcikevent();
-            });
-            
+                const touchEvent = event.changedTouches[0];
+                const touchX = (touchEvent.clientX / window.innerWidth) * 2 - 1;
+                const touchY = -(touchEvent.clientY / window.innerHeight) * 2 + 1;
+              
+                // 터치 좌표 설정
+                touch.set(touchX, touchY);
+                clickevent(touch);
+            }
+            );
+
             controller.addEventListener('touchmove', (event) => {
                 if (!isTouching) return;
                 event.preventDefault();
@@ -617,8 +625,11 @@
                 weatherAPI.data = -1;
             }
 
-            function clcikevent(){
-                raycaster.setFromCamera( mouse, camera );
+            function clickevent(control){
+                
+                raycaster.setFromCamera( control, camera );
+                
+
                 for (let i = 0; i < intersectBox.length; i++) {
                     let intersects = raycaster.intersectObjects( intersectBox );
                 if ( intersects.length > 0 ) {
@@ -643,7 +654,7 @@
             }}
 
             function onClick( event ) {    
-                clcikevent();
+                clickevent(mouse);
             }
 
             function onWindowResize() {
