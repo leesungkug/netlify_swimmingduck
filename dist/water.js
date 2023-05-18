@@ -19,7 +19,7 @@
             let isTouching = false;
             let touchStart = { x: 0, y: 0 };
 
-            let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, map, tv;
+            let scene, camera, clock, renderer, water, rubberduck, playerRotateVelocity, naver, inflearn, map, tv;
             let backupinersect;
             let boundingBox;
             // let boxHelper;
@@ -335,6 +335,28 @@
                     }, undefined, function ( error ) {
                         console.error( error );
                 });
+                //inflearn
+                gltfloader.load( './3dmodel/inflearn.glb', function( gltf ){
+                    gltf.scene.position.set(-5, 1.5, -2);
+                    worldOctree.fromGraphNode( gltf.scene );
+                    gltf.scene.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData = {
+                            link: 'https://www.inflearn.com'
+                        };
+                    child.name = 'inflearn'; // 이름 설정
+
+                    }});                    
+                    inflearn = gltf.scene;
+                    intersectBox.push(inflearn);
+
+                    
+                    // console.log( navera );
+                    scene.add( inflearn );
+
+                    }, undefined, function ( error ) {
+                        console.error( error );
+                });
 
 
 	            // skybox
@@ -556,14 +578,13 @@
                 {
                     switch(true)
                     {
-                        case (weather.sky <= 5):
+                        case (weather.sky <= 4):
                             return ("./weather/sun.png");
-                        case (weather.sky > 5 && sky < 8):
+                        case (weather.sky > 4 && sky < 8):
                             return ("./weather/cloudy.png");
                         case (weather.sky >= 8 && sky <= 10):
                             return ("./weather/cloud.png");
                     }
-
                 }
                 else
                 {                        
