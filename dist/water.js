@@ -30,20 +30,20 @@
             const loadingManager = new THREE.LoadingManager();
 
             loadingManager.onStart = function (url, itemsLoaded, itemsTotal) {
-            // 로딩이 시작될 때 호출되는 콜백 함수
+ 
             document.getElementById('loading').style.display = 'block';
             };
 
             loadingManager.onLoad = function () {
-            // 로딩이 완료될 때 호출되는 콜백 함수
+     
             document.getElementById('loading').style.display = 'none';
             camerazoom();
             };
 
             loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-            // 로딩 진행 상황을 추적하여 화면에 표시하는 로직을 구현합니다.
+
             console.log('Loaded ' + itemsLoaded + '/' + itemsTotal + ' files.');
-            // 로딩 상태를 나타내는 로딩 바 업데이트
+
             const progressBar = document.getElementById('loading-bar');            
             const progressText = document.getElementById('load-percent');
 
@@ -82,7 +82,6 @@
             const mouse = new THREE.Vector2();
             const touch = new THREE.Vector2();
             const buoyancy = new THREE.Vector3(0 ,0.005, 0);
-            //날씨
             let weatherAPI = new WeatherAPI("HqBrGQAZCs7F7Ho61Lri4K4z%2Bk1rXJfsXL6YGpw5lQjfSgYO6cl%2FIZze%2FSu9WT80mWfaKvwEbfeKFZT5UbytKw%3D%3D");
 
 
@@ -99,13 +98,10 @@
                 if (code === 'Space' || code === 32) {
                   buttoncheck = 0;
                 }
-              });       
-            // key('a', function(){ keyStates[ "KeyA"] = true; camm});
-            // key('w', function(){ keyStates[ "KeyW"] = true; });
-            // key('s', function(){ keyStates[ "KeyS"] = true; });
-            // key('d', function(){ keyStates[ "KeyD"] = true; });
-            // key('space', function(){ keyStates[ "Space"] = true; });
-            //컨트롤러 설정
+              });
+              
+  
+
             function getPointInCircle(center, radius, angle) {
                 const x = center.x + radius * Math.cos(angle);
                 const y = center.y + radius * Math.sin(angle);
@@ -113,20 +109,17 @@
             };
 
             function getCameraDirectionVector(camera) {
-                // 카메라의 월드 좌표 얻기
+             
                 const cameraPosition = camera.position.clone();
                 // console.log("camera position",camera.position);
               
-                // 카메라가 바라보는 지점의 월드 좌표 얻기
+    
                 const cameraTarget = rubberduck.position.clone();
-                // cameraTarget.setFromMatrixPosition(camera.matrixWorldInverse);
-                // console.log("camera target",cameraTarget);
 
-                // 방향 벡터 구하기
                 const directionVector = new THREE.Vector3();
                 directionVector.subVectors(cameraTarget, cameraPosition);
                 directionVector.y = 0;
-                // 정규화하여 단위 벡터로 만들기
+
                 directionVector.normalize();
               
                 return directionVector;
@@ -180,15 +173,7 @@
 
                 const dest_normaldir = new THREE.Vector3(deltaX, 0, deltaY).normalize();
                 rubberduck.userData.dest_dir = dest_normaldir;
-                // console.log("x : ", x);
-                // console.log("z : ", z);
-                // console.log("rubberdeuc : ", rubberduck.position);
-                    // console.log("direction : ", playerDirection);
-                        // console.log("destdirection : ", rubberduck.userData.dest_dir);
 
-                // playerVelocity.add( getForwardVector().multiplyScalar( speedDelta ) );
-
-                // 여기서 deltaX와 deltaY를 사용해 Three.js 카메라 또는 오브젝트를 조종하세요.
             });
 
             controller.addEventListener('touchend', () => {
@@ -531,33 +516,6 @@
                 mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
                 raycaster.setFromCamera( mouse, camera );
-
-                // 검색된 객체에 대해 하이라이트 스케일 처리
-                // if ( intersects.length > 0 ) {
-                //     // console.log(intersects);
-
-                //     const targetObject = intersects.find(intersect => intersect.object.name === 'naver');
-                //     if (targetObject) {
-                //         backupinersect =targetObject;
-                //         targetObject.object.material.emissive.setHex( 0x555555 );
-                //         console.log(targetObject.object);
-                //         const tween = new TWEEN.Tween(targetObject.object.scale)
-                //             .to({ x: 1.8, y: 1.8, z: 1.8 }, 500)
-                //             .easing(TWEEN.Easing.Quadratic.InOut)
-                //             .start();
-                //     }
-                    // else{
-                    //     if(backupinersect)
-                    //     {
-                    //         const tween = new TWEEN.Tween(backupinersect.object.scale)
-                    //         .to({ x: 1, y: 1, z: 1 }, 500)
-                    //         .easing(TWEEN.Easing.Quadratic.InOut)
-                    //         .start()
-                    //         backupinersect.object.material.emissive.setHex( 0x000000 );
-                    //         backupinersect = undefined;
-                    //     }
-                    // }
-                // }
                 
             }
 
@@ -648,7 +606,7 @@
                 for (let i = 0; i < intersectBox.length; i++) {
                     let intersects = raycaster.intersectObjects( intersectBox );
                 if ( intersects.length > 0 ) {
-                    // 3. href 값 가져오기
+
                     // console.log(intersects[0].point);
                     // console.log(intersects[0]);
                     let flag = intersects[0].object.userData;
@@ -656,7 +614,7 @@
                     {
                         let link = intersects[0].object.userData.link;
                         console.log(link);
-                        // 4. 새로운 페이지로 이동
+
                         window.open( link );
                     }
                     else(flag.weather == 1)
@@ -714,14 +672,6 @@
 
             }
 
-			// function getSideVector( angle ) {
-            // playerDirection.copy(headDirection);
-            // // console.log(headDirection);
-            // playerDirection.applyAxisAngle(axis, angle);
-            // playerDirection.normalize();
-            // // console.log(playerDirection);
-            // return playerDirection;
-            // }
             function getForwardVector() {
 
             // camera.getWorldDirection( playerDirection );
@@ -788,7 +738,6 @@
                         // console.log(intersectBox[i]);
                         if(intersectBox[i].flag !== 2)
                             intersectBox[i].flag = 1;
-                        // 충돌했을 때 수행할 로직 작성
                     }
                     else{
                         intersectBox[i].flag = 0;
@@ -798,7 +747,6 @@
 
             function controls( deltaTime ) {
 
-                // gives a bit of air control
                 const speedDelta = deltaTime * 10;
 
                 if ( keyStates[ 'KeyW' ] ) {
@@ -823,7 +771,6 @@
                             if (intersectBox[i].flag > 0){
                                 let link = intersectBox[i].children[0].userData.link;
                                 console.log(link);
-                                // 4. 새cd 로운 페이지로 이동
                                 window.open( link );
                                 buttoncheck = 1;
                             }
@@ -836,8 +783,6 @@
             {
                 if (rubberduck.userData.mobile_move >= 1)
                 {
-
-                    
                     // const deltax =  rubberduck.userData.dest_x - rubberduck.position.x;
                     // const deltaz =  rubberduck.userData.dest_z - rubberduck.position.z;
                     // console.log("deltax : ",deltax);
@@ -899,7 +844,7 @@
                     intersectBox[i].flag = 2;
                     // console.log(targetObject);
                     // console.log(scene.children);    
-                    // 충돌했을 때 수행할 로직 작성
+
                 }
                 else if(intersectBox[i].flag === 0){
                     if(backupinersect == intersectBox[i].children[0])
@@ -971,9 +916,6 @@
 
                 const deltaTime = Math.min( 0.05, clock.getDelta() ) / STEPS_PER_FRAME;
 
-			// 	// we look for collisions in substeps to mitigate the risk of
-			// 	// an object traversing another too quickly for detection.
-
     		    for ( let i = 0; i < STEPS_PER_FRAME; i ++ ) {
                     // console.log("time :",deltaTime);
                     if (rubberduck.userData.mobile_move >= 1)
@@ -1001,7 +943,6 @@
                 setTimeout(() => {
                     requestAnimationFrame(animate);
                 }, 0);
-                // console.log("check!!!");
 
                 // console.log("check!");
 

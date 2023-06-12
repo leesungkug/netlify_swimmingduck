@@ -101,12 +101,14 @@ export class WeatherAPI {
         const currentHour = currentTime.getHours();
         
         const currentYear = currentTime.getFullYear();
-        const currentMonth = currentTime.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줍니다.
+        const currentMonth = currentTime.getMonth() + 1;
         const currentDay = currentTime.getDate();
         this.day = currentYear;
         if(currentMonth < 10)
             this.day += "0";
         this.day += `${currentMonth}`;
+        if(currentDay < 10)
+            this.day += "0";
         this.day += `${currentDay}`;
         this.realtime = `${currentHour}` + "00";
         if (currentHour < 10)
