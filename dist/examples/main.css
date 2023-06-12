@@ -69,8 +69,8 @@ button {
 	position: absolute;
 	top: 60px;
 	right: 20px;
-	width: 450px;
-	height: 300px;
+	width: 50%;
+	height: 50%;
 	background-color: rgba(200, 200, 200, 0.5);
 	border-radius: 10px;
 }
@@ -82,10 +82,7 @@ button {
 	object-fit: cover;
 }
 
-#explane-content :active
-{
-	display:flex;
-}
+
 #info {
 	position: absolute;
 	top: 0px;

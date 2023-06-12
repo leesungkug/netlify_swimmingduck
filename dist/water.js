@@ -100,7 +100,6 @@
                 }
               });
               
-  
 
             function getPointInCircle(center, radius, angle) {
                 const x = center.x + radius * Math.cos(angle);
@@ -230,7 +229,7 @@
                 });
 
                 const effectLoader = new AudioLoader();
-                musicLoader.load('./audio/rubberduckeffect.wav', function(buffer) {
+                effectLoader.load('./audio/rubberduckeffect.wav', function(buffer) {
                     effect.setBuffer(buffer);
                     effect.setVolume(0.05);
                 });
@@ -268,9 +267,7 @@
                 water.rotation.x = Math.PI * - 0.5;
                 scene.add( water );
                 
-
                 //rubberduck
-
 
                 gltfloader.load( './3dmodel/rubberduckmodel.glb', function( gltf ){
                     gltf.scene.position.set(0, 0.57, 0);
@@ -413,8 +410,10 @@
                 const musicBtn = document.getElementById('music-btn');
                 musicBtn.addEventListener('click', function() {
                     if (music.isPlaying) {
+                        musicBtn.querySelector("img").src ="./audio/icon/nospecker.png";
                         music.pause();
                     } else {
+                        musicBtn.querySelector("img").src ="./audio/icon/specker2.png";
                         music.play();
                     }
                 });
@@ -465,7 +464,6 @@
                     // console.log(map);
                     // // console.log( navera );
                     scene.add( map );
-                    music.play();
                     if (isMobile()) {
                         controller.style.display = 'flex';
                     } else {
@@ -479,7 +477,6 @@
         }
         function screenupdate(texture)
         {
-            // 텍스처를 사용하는 메쉬 생성
             const tvscreen = tv.children[0].children[0].children[0].children[0].children[0];
             tvscreen.material = new THREE.MeshBasicMaterial({ map: texture });
         }
